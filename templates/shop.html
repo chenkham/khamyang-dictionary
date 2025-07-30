@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tai-Khamyang Shop - Traditional Dress & Culture</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='shop.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>TAI KHAMYANG</h2>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/dictionary" class="nav-link">Dictionary</a>
+                <a href="/songs" class="nav-link">Songs</a>
+                <a href="/shopnow" class="nav-link active">Shop</a>
+                <a href="/about" class="nav-link">About</a>
+                <a href="/admin" class="nav-link">Admin</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="shop-mode">
+        <div class="container">
+            <h1 class="page-title">Traditional Tai-Khamyang Marketplace</h1>
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="buyer">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Buyer</span>
+                </button>
+                <button class="mode-btn" data-mode="seller">
+                    <i class="fas fa-store"></i>
+                    <span>Seller</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="buyer-section" id="buyerSection">
+        <div class="search-section">
+            <div class="container">
+                <div class="search-bar">
+                    <div class="search-input-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search traditional dresses, accessories...">
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-category="all">All</button>
+                        <button class="filter-btn" data-category="women">Women's Dress</button>
+                        <button class="filter-btn" data-category="men">Men's Dress</button>
+                        <button class="filter-btn" data-category="accessories">Accessories</button>
+                        <button class="filter-btn" data-category="jewelry">Jewelry</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="products-section">
+            <div class="container">
+                <div class="products-grid" id="productsGrid">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="seller-section hidden" id="sellerSection">
+        <div class="container">
+            <div class="seller-auth" id="sellerAuth">
+                <div class="auth-container">
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" data-form="login">Login</button>
+                        <button class="auth-tab" data-form="register">Register</button>
+                    </div>
+                    <!-- the seller login form in shop.html -->
+                     <form class="auth-form" id="loginForm">
+                         <h3>Seller Login</h3>
+                         <div class="form-group">
+                             <i class="fas fa-envelope"></i>
+                             <input type="email" placeholder="Email Address" id="loginEmail" required>
+                         </div>
+                         <div class="form-group">
+                             <i class="fas fa-lock"></i>
+                             <input type="password" placeholder="Password" id="loginPassword" required>
+                         </div>
+                         <button type="submit" class="auth-btn">Login to Dashboard</button>
+                         <div style="text-align: center; margin-top: 15px;">
+                         <a href="{{ url_for('sorry_page') }}" style="color: #667eea; text-decoration: none;">
+                             Forgot Password?
+                         </a>
+                     </div>
+
+                     </form>
+
+                    <form class="auth-form hidden" id="registerForm">
+                        <h3>Become a Seller</h3>
+                        <div class="form-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" placeholder="Full Name" id="regName" required>
+                        </div>
+                        <div class="form-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" placeholder="Email Address" id="regEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="regPhone" placeholder="Phone Number" required>
+                        </div>
+                        <div class="form-group">
+                            <i class="fab fa-whatsapp"></i>
+                            <input type="tel" id="regWhatsapp" placeholder="WhatsApp Number (with country code)" required>
+                        </div>
+                        <div class="form-group">
+                            <i class="fas fa-store"></i>
+                            <input type="text" placeholder="Shop Name" id="regShopName" required>
+                        </div>
+                        <div class="form-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" placeholder="Password" id="regPassword" required>
+                        </div>
+                        <button type="submit" class="auth-btn">Create Seller Account</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="seller-dashboard hidden" id="sellerDashboard">
+                <div class="dashboard-header">
+                    <h2 id="dashboardWelcome">Welcome to Your Dashboard</h2>
+                    <button class="logout-btn" id="sellerLogoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+                <div class="dashboard-nav">
+                    <button class="dashboard-btn active" data-section="add">
+                        <i class="fas fa-plus-circle"></i> Add Product
+                    </button>
+                    <button class="dashboard-btn" data-section="manage">
+                        <i class="fas fa-boxes"></i> Manage Products
+                    </button>
+                </div>
+                <div class="dashboard-section" id="addProductsSection">
+                     <h3>Add New Product</h3>
+                    <form class="product-form" id="addProductForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <input type="text" placeholder="e.g., Traditional Tai-Khamyang Dress" id="productName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="productCategory">
+                                    <option value="women">Women's Dress</option>
+                                    <option value="men">Men's Dress</option>
+                                    <option value="accessories">Accessories</option>
+                                    <option value="jewelry">Jewelry</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Price (₹)</label>
+                                <input type="number" placeholder="2999" id="productPrice" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Original Price (₹)</label>
+                                <input type="number" placeholder="3499" id="productOriginalPrice">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Description</label>
+                            <textarea placeholder="Describe your traditional product..." id="productDescription" required></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Stock Quantity</label>
+                                <input type="number" placeholder="10" id="productStock" required>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Image Upload Section -->
+                        <div class="form-group">
+                            <label>Product Images (Max 5 images, 2MB each)</label>
+                            <div class="image-upload-container">
+                                <div class="upload-area" id="uploadArea">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Click or drag images here</p>
+                                    <small>Support: JPG, PNG, WEBP (Max 2MB each)</small>
+                                </div>
+                                <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+                                <div class="image-preview-container" id="imagePreview"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                    </form>
+                </div>
+                <div class="dashboard-section hidden" id="manageProductsSection">
+                    <h3>Manage Your Products</h3>
+                    <div class="products-management" id="sellerProductsTable">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Product Detail Popup -->
+    <div class="product-detail-popup hidden" id="productDetailPopup">
+        <div class="popup-overlay"></div>
+        <div class="popup-content">
+            <button class="close-btn" id="popupCloseBtn">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="product-detail-content">
+                <div class="product-images-section">
+                    <div class="main-image-container">
+                        <img id="detailMainImage" src="" alt="Product">
+                        <div class="image-navigation">
+                            <button class="nav-btn prev-btn" id="prevImageBtn">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="nav-btn next-btn" id="nextImageBtn">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="thumbnail-container" id="thumbnailContainer">
+                        <!-- Thumbnails will be populated here -->
+                    </div>
+                </div>
+                <div class="product-details-section">
+                    <div class="product-header">
+                        <h2 id="detailTitle"></h2>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span>(4.5 rating)</span>
+                        </div>
+                    </div>
+
+                    <p class="detail-seller" id="detailSeller"></p>
+
+                    <div class="detail-price-section">
+                        <div class="price-container">
+                            <span class="detail-current-price" id="detailPrice"></span>
+                            <span class="detail-original-price" id="detailOriginalPrice"></span>
+                            <span class="detail-discount" id="detailDiscount"></span>
+                        </div>
+                        <div class="savings-info" id="savingsInfo"></div>
+                    </div>
+
+                    <div class="product-info-tabs">
+                        <div class="tab-headers">
+                            <button class="tab-header active" data-tab="description">Description</button>
+                            <button class="tab-header" data-tab="details">Details</button>
+                        </div>
+                        <div class="tab-content active" id="descriptionTab">
+                            <p id="detailDescription"></p>
+                        </div>
+                        <div class="tab-content" id="detailsTab">
+                            <div class="detail-info">
+                                <div class="info-item">
+                                    <span class="info-label">Stock:</span>
+                                    <span class="info-value" id="stockInfo">Available</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Category:</span>
+                                    <span class="info-value" id="categoryInfo"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-actions">
+                        <button class="buy-now-btn" id="buyOnWhatsAppBtn">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>Buy on WhatsApp</span>
+                        </button>
+                        <button class="contact-seller-btn" id="contactSellerBtn">
+                            <i class="fas fa-phone"></i>
+                            <span>Contact Seller</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div class="edit-product-modal hidden" id="editProductModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Product</h3>
+                <button class="close-modal-btn" id="closeEditModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="edit-product-form" id="editProductForm">
+                <input type="hidden" id="editProductId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="editProductName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="editProductCategory">
+                            <option value="women">Women's Dress</option>
+                            <option value="men">Men's Dress</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="jewelry">Jewelry</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="editProductPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Original Price (₹)</label>
+                        <input type="number" id="editProductOriginalPrice">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editProductDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Stock Quantity</label>
+                    <input type="number" id="editProductStock" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" id="cancelEditBtn">Cancel</button>
+                    <button type="submit" class="save-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- STATE ---
+    let products = [];
+    let currentUser = null;
+    let selectedImages = [];
+    let currentImageIndex = 0;
+    let currentProductImages = [];
+
+    // --- SELECTORS ---
+    const buyerSection = document.getElementById('buyerSection');
+    const sellerSection = document.getElementById('sellerSection');
+    const productsGrid = document.getElementById('productsGrid');
+    const searchInput = document.getElementById('searchInput');
+    const sellerAuth = document.getElementById('sellerAuth');
+    const sellerDashboard = document.getElementById('sellerDashboard');
+    const uploadArea = document.getElementById('uploadArea');
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+
+    // --- INITIALIZATION ---
+    const initializeApp = () => {
+        setupEventListeners();
+        switchMode('buyer'); // Default to buyer mode
+    };
+
+    // --- EVENT LISTENERS ---
+    const setupEventListeners = () => {
+        // Mode Switching
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+        });
+
+        // Hamburger menu toggle
+        document.getElementById('hamburger').addEventListener('click', toggleMobileMenu);
+
+        // Image Upload Events
+        uploadArea.addEventListener('click', () => imageInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('drop', handleDrop);
+        imageInput.addEventListener('change', handleImageSelect);
+
+        // Buyer: Product Filtering and Search
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelector('.filter-btn.active').classList.remove('active');
+                btn.classList.add('active');
+                filterProducts(btn.dataset.category);
+            });
+        });
+        searchInput.addEventListener('keyup', handleSearch);
+
+        // Buyer: Product Click (Event Delegation)
+        productsGrid.addEventListener('click', (e) => {
+            const card = e.target.closest('.product-card');
+            if (card) {
+                const productId = card.dataset.productId;
+                const product = products.find(p => p.id === productId);
+                if (product) openProductDetail(product);
+            }
+        });
+
+        // Seller: Auth Form Switching
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => showAuthForm(tab.dataset.form));
+        });
+
+        // Seller: Forms
+        document.getElementById('loginForm').addEventListener('submit', handleSellerLogin);
+        document.getElementById('registerForm').addEventListener('submit', handleSellerRegister);
+        document.getElementById('addProductForm').addEventListener('submit', handleAddProduct);
+        document.getElementById('sellerLogoutBtn').addEventListener('click', handleSellerLogout);
+
+        // Seller: Dashboard Navigation
+        document.querySelectorAll('.dashboard-btn').forEach(btn => {
+            btn.addEventListener('click', () => showDashboardSection(btn.dataset.section));
+        });
+
+        // Product Detail Modal Events
+        document.getElementById('popupCloseBtn').addEventListener('click', closeProductDetail);
+        document.querySelector('.product-detail-popup .popup-overlay').addEventListener('click', closeProductDetail);
+        document.getElementById('prevImageBtn').addEventListener('click', () => changeImage(-1));
+        document.getElementById('nextImageBtn').addEventListener('click', () => changeImage(1));
+
+        // Product Detail Tabs
+        document.querySelectorAll('.tab-header').forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        // Edit Product Modal Events
+        document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
+        document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
+        document.getElementById('editProductForm').addEventListener('submit', handleEditProduct);
+
+        // Manage Products: Action Buttons (Event Delegation)
+        document.getElementById('sellerProductsTable').addEventListener('click', (e) => {
+            if (e.target.closest('.delete-btn')) {
+                const button = e.target.closest('.delete-btn');
+                const productId = button.dataset.productId;
+                deleteProduct(productId);
+            } else if (e.target.closest('.edit-btn')) {
+                const button = e.target.closest('.edit-btn');
+                const productId = button.dataset.productId;
+                openEditModal(productId);
+            }
+        });
+    };
+
+    // Mobile menu toggle function
+    const toggleMobileMenu = () => {
+        const navMenu = document.getElementById('navMenu');
+        navMenu.classList.toggle('active');
+        document.getElementById('hamburger').classList.toggle('active');
+    };
+
+    // --- IMAGE UPLOAD FUNCTIONS ---
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        const files = Array.from(e.dataTransfer.files);
+        processImageFiles(files);
+    };
+
+    const handleImageSelect = (e) => {
+        const files = Array.from(e.target.files);
+        processImageFiles(files);
+    };
+
+    const processImageFiles = (files) => {
+        const imageFiles = files.filter(file => file.type.startsWith('image/'));
+
+        if (selectedImages.length + imageFiles.length > 5) {
+            alert('Maximum 5 images allowed');
+            return;
+        }
+
+        imageFiles.forEach(file => {
+            if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                alert(`${file.name} is too large. Maximum size is 2MB.`);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedImages.push({
+                    file: file,
+                    url: e.target.result,
+                    name: file.name
+                });
+                updateImagePreview();
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const updateImagePreview = () => {
+        imagePreview.innerHTML = '';
+        selectedImages.forEach((image, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-preview-item';
+            previewItem.innerHTML = `
+                <img src="${image.url}" alt="${image.name}">
+                <button type="button" class="remove-image-btn" data-index="${index}">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="image-name">${image.name}</div>
+            `;
+            imagePreview.appendChild(previewItem);
+        });
+
+        // Add event listeners for remove buttons
+        document.querySelectorAll('.remove-image-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.closest('.remove-image-btn').dataset.index);
+                selectedImages.splice(index, 1);
+                updateImagePreview();
+            });
+        });
+    };
+
+    // --- MODE SWITCHING ---
+    const switchMode = (mode) => {
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+
+        if (mode === 'buyer') {
+            buyerSection.classList.remove('hidden');
+            sellerSection.classList.add('hidden');
+            loadProducts();
+        } else {
+            buyerSection.classList.add('hidden');
+            sellerSection.classList.remove('hidden');
+            checkSellerLoginStatus();
+        }
+    };
+
+    // --- BUYER FUNCTIONS ---
+    const loadProducts = async () => {
+        try {
+            const response = await fetch('/api/products');
+            const data = await response.json();
+            if (data.success) {
+                products = data.products;
+                displayProducts(products);
+            } else {
+                console.error('Failed to load products:', data.message);
+                productsGrid.innerHTML = '<p>Could not load products.</p>';
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            productsGrid.innerHTML = '<p>Error loading products.</p>';
+        }
+    };
+
+    const displayProducts = (productsToDisplay) => {
+        productsGrid.innerHTML = '';
+        if (productsToDisplay.length === 0) {
+            productsGrid.innerHTML = '<p>No products found.</p>';
+            return;
+        }
+        productsToDisplay.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.dataset.productId = product.id;
+
+            const originalPrice = parseFloat(product.original_price);
+            const currentPrice = parseFloat(product.price);
+            let discountHTML = '';
+            if (originalPrice > currentPrice) {
+                const discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+                discountHTML = `<span class="discount">${discount}% OFF</span>`;
+            }
+
+            // Use first image or placeholder
+            const imageUrl = product.images && product.images.length > 0
+                ? product.images[0]
+                : 'https://via.placeholder.com/300x400';
+
+            card.innerHTML = `
+                <div class="product-image">
+                    <img src="${imageUrl}" alt="${product.name}">
+                    ${discountHTML}
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p class="seller-info">By: ${product.seller_info?.business_name || 'N/A'}</p>
+                    <div class="price-section">
+                        <span class="current-price">₹${currentPrice.toFixed(2)}</span>
+                        ${originalPrice > currentPrice ? `<span class="original-price">₹${originalPrice.toFixed(2)}</span>` : ''}
+                    </div>
+                </div>`;
+            productsGrid.appendChild(card);
+        });
+    };
+
+    const handleSearch = () => {
+        const query = searchInput.value.toLowerCase();
+        const filtered = products.filter(p =>
+            p.name.toLowerCase().includes(query) ||
+            p.description.toLowerCase().includes(query) ||
+            p.category.toLowerCase().includes(query)
+        );
+        displayProducts(filtered);
+    };
+
+    const filterProducts = (category) => {
+        if (category === 'all') {
+            displayProducts(products);
+        } else {
+            const filtered = products.filter(p => p.category.toLowerCase() === category);
+            displayProducts(filtered);
+        }
+    };
+
+    // --- ENHANCED PRODUCT DETAIL POPUP ---
+    const openProductDetail = (product) => {
+        const popup = document.getElementById('productDetailPopup');
+
+        // Set product info
+        document.getElementById('detailTitle').textContent = product.name;
+        document.getElementById('detailDescription').textContent = product.description;
+        document.getElementById('detailSeller').textContent = `Sold by: ${product.seller_info?.business_name || 'N/A'}`;
+        document.getElementById('categoryInfo').textContent = product.category;
+        document.getElementById('stockInfo').textContent = product.stock_quantity > 0 ? `${product.stock_quantity} available` : 'Out of stock';
+
+        // Set price info
+        const originalPrice = parseFloat(product.original_price);
+        const currentPrice = parseFloat(product.price);
+        document.getElementById('detailPrice').textContent = `₹${currentPrice.toFixed(2)}`;
+
+        const originalPriceEl = document.getElementById('detailOriginalPrice');
+        const discountEl = document.getElementById('detailDiscount');
+        const savingsEl = document.getElementById('savingsInfo');
+
+        if (originalPrice > currentPrice) {
+            const discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+            const savings = originalPrice - currentPrice;
+
+            originalPriceEl.textContent = `₹${originalPrice.toFixed(2)}`;
+            originalPriceEl.style.display = 'inline';
+            discountEl.textContent = `${discount}% OFF`;
+            discountEl.style.display = 'inline';
+            savingsEl.textContent = `You save ₹${savings.toFixed(2)}`;
+            savingsEl.style.display = 'block';
+        } else {
+            originalPriceEl.style.display = 'none';
+            discountEl.style.display = 'none';
+            savingsEl.style.display = 'none';
+        }
+
+        // Setup images
+        currentProductImages = product.images || ['https://via.placeholder.com/600x600'];
+        currentImageIndex = 0;
+        setupProductImages();
+
+        // WhatsApp button logic
+        const buyBtn = document.getElementById('buyOnWhatsAppBtn');
+        const contactBtn = document.getElementById('contactSellerBtn');
+
+        if (product.seller_info?.whatsapp) {
+            const message = encodeURIComponent(`Hi, I'm interested in your product: ${product.name} (Price: ₹${product.price})`);
+            const whatsappUrl = `https://wa.me/${product.seller_info.whatsapp}?text=${message}`;
+            buyBtn.onclick = () => window.open(whatsappUrl, '_blank');
+            contactBtn.onclick = () => window.open(`https://wa.me/${product.seller_info.whatsapp}`, '_blank');
+            buyBtn.disabled = false;
+            contactBtn.disabled = false;
+        } else {
+            buyBtn.onclick = null;
+            contactBtn.onclick = null;
+            buyBtn.disabled = true;
+            contactBtn.disabled = true;
+        }
+
+        popup.classList.remove('hidden');
+    };
+
+    const setupProductImages = () => {
+        const mainImage = document.getElementById('detailMainImage');
+        const thumbnailContainer = document.getElementById('thumbnailContainer');
+
+        // Set main image
+        mainImage.src = currentProductImages[currentImageIndex];
+
+        // Clear and setup thumbnails
+        thumbnailContainer.innerHTML = '';
+        currentProductImages.forEach((imageUrl, index) => {
+            const thumbnail = document.createElement('div');
+            thumbnail.className = `thumbnail ${index === currentImageIndex ? 'active' : ''}`;
+            thumbnail.innerHTML = `<img src="${imageUrl}" alt="Product ${index + 1}">`;
+            thumbnail.addEventListener('click', () => {
+                currentImageIndex = index;
+                setupProductImages();
+            });
+            thumbnailContainer.appendChild(thumbnail);
+        });
+
+        // Show/hide navigation buttons
+        const prevBtn = document.getElementById('prevImageBtn');
+        const nextBtn = document.getElementById('nextImageBtn');
+        prevBtn.style.display = currentProductImages.length > 1 ? 'block' : 'none';
+        nextBtn.style.display = currentProductImages.length > 1 ? 'block' : 'none';
+    };
+
+    const changeImage = (direction) => {
+        currentImageIndex += direction;
+        if (currentImageIndex < 0) currentImageIndex = currentProductImages.length - 1;
+        if (currentImageIndex >= currentProductImages.length) currentImageIndex = 0;
+        setupProductImages();
+    };
+
+    const switchTab = (tabName) => {
+        document.querySelectorAll('.tab-header').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        document.querySelector(`.tab-header[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`${tabName}Tab`).classList.add('active');
+    };
+
+    const closeProductDetail = () => {
+        document.getElementById('productDetailPopup').classList.add('hidden');
+    };
+
+    // --- SELLER FUNCTIONS ---
+    const checkSellerLoginStatus = () => {
+        if (currentUser) {
+            showSellerDashboard();
+        } else {
+            showSellerAuth();
+        }
+    };
+
+    const showSellerAuth = () => {
+        sellerAuth.classList.remove('hidden');
+        sellerDashboard.classList.add('hidden');
+        showAuthForm('login');
+    };
+
+    const showSellerDashboard = () => {
+        sellerAuth.classList.add('hidden');
+        sellerDashboard.classList.remove('hidden');
+        document.getElementById('dashboardWelcome').textContent = `Welcome, ${currentUser.business_name}`;
+        showDashboardSection('add');
+        loadSellerProducts();
+    };
+
+    const showAuthForm = (formType) => {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.auth-tab[data-form="${formType}"]`).classList.add('active');
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.add('hidden'));
+        document.getElementById(`${formType}Form`).classList.remove('hidden');
+    };
+
+    const handleSellerLogin = async (e) => {
+        e.preventDefault();
+        const data = {
+            email: document.getElementById('loginEmail').value.trim(),
+            password: document.getElementById('loginPassword').value
+        };
+
+        if (!data.email || !data.password) {
+            alert('Please enter both email and password.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/seller/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (result.success) {
+                currentUser = result.seller;
+                showSellerDashboard();
+            } else {
+                alert(`Login failed: ${result.message || 'Invalid credentials'}`);
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('An error occurred during login. Please try again.');
+        }
+    };
+
+    const handleSellerRegister = async (e) => {
+        e.preventDefault();
+        const data = {
+            fullName: document.getElementById('regName').value.trim(),
+            email: document.getElementById('regEmail').value.trim(),
+            phone: document.getElementById('regPhone').value.trim(),
+            whatsapp: document.getElementById('regWhatsapp').value.trim(),
+            shopName: document.getElementById('regShopName').value.trim(),
+            password: document.getElementById('regPassword').value
+        };
+
+        // Basic validation
+        if (!data.fullName || !data.email || !data.phone || !data.whatsapp || !data.shopName || !data.password) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        if (data.password.length < 6) {
+            alert('Password must be at least 6 characters long.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/seller/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert('Registration successful! Please login.');
+                showAuthForm('login');
+                // Clear form
+                document.getElementById('registerForm').reset();
+            } else {
+                alert(`Registration failed: ${result.message || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            alert('An error occurred during registration. Please try again.');
+        }
+    };
+
+    const handleSellerLogout = async () => {
+        try {
+            await fetch('/api/seller/logout', { method: 'POST' });
+            currentUser = null;
+            selectedImages = [];
+            updateImagePreview();
+            showSellerAuth();
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('An error occurred during logout.');
+        }
+    };
+
+    // --- SELLER DASHBOARD FUNCTIONS ---
+    const showDashboardSection = (section) => {
+    document.querySelectorAll('.dashboard-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.dashboard-btn[data-section="${section}"]`).classList.add('active');
+
+    document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
+
+    // Add this FIX:
+    const sectionId = `${section}ProductsSection`;  // make sure it matches your HTML ID
+    const targetSection = document.getElementById(sectionId);
+
+    if (targetSection) {
+        targetSection.classList.remove('hidden');
+    } else {
+        console.error(`Missing section ID: ${sectionId}`);
+    }
+
+    if (section === 'manage') loadSellerProducts();
+};
+
+
+    const handleAddProduct = async (e) => {
+        e.preventDefault();
+
+        // Client-side validation
+        const productName = document.getElementById('productName').value.trim();
+        const productPrice = document.getElementById('productPrice').value;
+        const productDescription = document.getElementById('productDescription').value.trim();
+        const productStock = document.getElementById('productStock').value;
+
+        if (!productName || !productPrice || !productDescription || !productStock) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        if (selectedImages.length === 0) {
+            alert('Please add at least one product image.');
+            return;
+        }
+
+        const submitBtn = e.target.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+        try {
+            // Simulate image upload if API endpoint not available
+            let imageUrls = [];
+            if (typeof uploadImages === 'function') {
+                imageUrls = await uploadImages(selectedImages);
+            } else {
+                // Fallback - use the data URLs directly (not recommended for production)
+                imageUrls = selectedImages.map(img => img.url);
+                console.warn('Image upload API not available - using data URLs directly');
+            }
+
+            const data = {
+                name: productName,
+                category: document.getElementById('productCategory').value,
+                price: productPrice,
+                originalPrice: document.getElementById('productOriginalPrice').value || productPrice,
+                description: productDescription,
+                stockQuantity: productStock,
+                images: imageUrls,
+                seller_id: currentUser?.id || null // Include seller ID if available
+            };
+
+            // Simulate API response if endpoint not available
+            let response;
+            if (typeof fetch === 'function') {
+                response = await fetch('/api/products/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            } else {
+                // Mock response for testing
+                console.log('Product data to be submitted:', data);
+                response = {
+                    json: async () => ({
+                        success: true,
+                        message: 'Product added successfully (simulated)',
+                        product: {
+                            id: 'mock-' + Date.now(),
+                            ...data
+                        }
+                    })
+                };
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('Product added successfully!');
+                e.target.reset();
+                selectedImages = [];
+                updateImagePreview();
+                // Add to local products array
+                if (result.product) {
+                    products.push(result.product);
+                }
+                showDashboardSection('manage');
+            } else {
+                alert(`Failed to add product: ${result.message || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Add product error:', error);
+            alert(`An error occurred while adding the product: ${error.message}`);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Product';
+        }
+    };
+
+    const loadSellerProducts = async () => {
+        const tableContainer = document.getElementById('sellerProductsTable');
+        try {
+            // Simulate API call if needed
+            let response;
+            if (typeof fetch === 'function') {
+                response = await fetch('/api/seller/products');
+            } else {
+                // Mock response for testing
+                console.log('Fetching seller products');
+                response = {
+                    json: async () => ({
+                        success: true,
+                        products: products.filter(p => p.seller_id === (currentUser?.id || ''))
+                    })
+                };
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                displaySellerProducts(data.products);
+            } else {
+                tableContainer.innerHTML = '<p>Could not load your products.</p>';
+            }
+        } catch (error) {
+            console.error('Load seller products error:', error);
+            tableContainer.innerHTML = '<p>Error loading your products.</p>';
+        }
+    };
+
+    const displaySellerProducts = (sellerProducts) => {
+        const tableContainer = document.getElementById('sellerProductsTable');
+        tableContainer.innerHTML = '';
+
+        if (sellerProducts.length === 0) {
+            tableContainer.innerHTML = '<p class="no-products">You have not added any products yet.</p>';
+            return;
+        }
+
+        const productsGrid = document.createElement('div');
+        productsGrid.className = 'seller-products-grid';
+
+        sellerProducts.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'seller-product-card';
+
+            const imageUrl = product.images && product.images.length > 0
+                ? product.images[0]
+                : 'https://via.placeholder.com/200x200';
+
+            const originalPrice = parseFloat(product.original_price);
+            const currentPrice = parseFloat(product.price);
+            let discountHTML = '';
+            if (originalPrice > currentPrice) {
+                const discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+                discountHTML = `<span class="product-discount">${discount}% OFF</span>`;
+            }
+
+            productCard.innerHTML = `
+                <div class="product-image-container">
+                    <img src="${imageUrl}" alt="${product.name}">
+                    ${discountHTML}
+                </div>
+                <div class="product-info-container">
+                    <h4 class="product-title">${product.name}</h4>
+                    <p class="product-category">${product.category}</p>
+                    <div class="product-price-info">
+                        <span class="current-price">₹${currentPrice.toFixed(2)}</span>
+                        ${originalPrice > currentPrice ? `<span class="original-price">₹${originalPrice.toFixed(2)}</span>` : ''}
+                    </div>
+                    <div class="product-stats">
+                        <span class="stock-info">
+                            <i class="fas fa-box"></i>
+                            Stock: ${product.stock_quantity}
+                        </span>
+                        <span class="status-badge status-${product.status || 'active'}">${product.status || 'active'}</span>
+                    </div>
+                    <div class="product-actions">
+                        <button class="edit-btn" data-product-id="${product.id}" title="Edit Product">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn" data-product-id="${product.id}" title="Delete Product">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            productsGrid.appendChild(productCard);
+        });
+
+        tableContainer.appendChild(productsGrid);
+    };
+
+    // --- EDIT PRODUCT FUNCTIONS ---
+    const openEditModal = async (productId) => {
+        try {
+            // Simulate API call if needed
+            let response;
+            if (typeof fetch === 'function') {
+                response = await fetch(`/api/products/${productId}`);
+            } else {
+                // Mock response for testing
+                console.log('Fetching product details for:', productId);
+                const product = products.find(p => p.id === productId);
+                response = {
+                    json: async () => ({
+                        success: !!product,
+                        product: product || null
+                    })
+                };
+            }
+
+            const data = await response.json();
+
+            if (data.success && data.product) {
+                const product = data.product;
+
+                document.getElementById('editProductId').value = product.id;
+                document.getElementById('editProductName').value = product.name;
+                document.getElementById('editProductCategory').value = product.category;
+                document.getElementById('editProductPrice').value = product.price;
+                document.getElementById('editProductOriginalPrice').value = product.original_price;
+                document.getElementById('editProductDescription').value = product.description;
+                document.getElementById('editProductStock').value = product.stock_quantity;
+
+                document.getElementById('editProductModal').classList.remove('hidden');
+            } else {
+                alert('Failed to load product details');
+            }
+        } catch (error) {
+            console.error('Open edit modal error:', error);
+            alert('Error loading product details');
+        }
+    };
+
+    const closeEditModal = () => {
+        document.getElementById('editProductModal').classList.add('hidden');
+    };
+
+    const handleEditProduct = async (e) => {
+        e.preventDefault();
+
+        const productId = document.getElementById('editProductId').value;
+        const data = {
+            name: document.getElementById('editProductName').value.trim(),
+            category: document.getElementById('editProductCategory').value,
+            price: document.getElementById('editProductPrice').value,
+            originalPrice: document.getElementById('editProductOriginalPrice').value,
+            description: document.getElementById('editProductDescription').value.trim(),
+            stockQuantity: document.getElementById('editProductStock').value
+        };
+
+        // Validation
+        if (!data.name || !data.price || !data.description || !data.stockQuantity) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        try {
+            // Simulate API call if needed
+            let response;
+            if (typeof fetch === 'function') {
+                response = await fetch(`/api/products/${productId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            } else {
+                // Mock response for testing
+                console.log('Updating product:', productId, data);
+                const index = products.findIndex(p => p.id === productId);
+                if (index >= 0) {
+                    products[index] = { ...products[index], ...data };
+                }
+                response = {
+                    json: async () => ({
+                        success: index >= 0,
+                        message: index >= 0 ? 'Product updated' : 'Product not found'
+                    })
+                };
+            }
+
+            const result = await response.json();
+            if (result.success) {
+                alert('Product updated successfully!');
+                closeEditModal();
+                loadSellerProducts();
+                // Refresh buyer view if needed
+                if (!buyerSection.classList.contains('hidden')) {
+                    displayProducts(products);
+                }
+            } else {
+                alert(`Failed to update product: ${result.message || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Edit product error:', error);
+            alert('An error occurred while updating the product.');
+        }
+    };
+
+    const deleteProduct = async (productId) => {
+    const confirmDelete = confirm("Are you sure you want to delete this product?");
+    if (!confirmDelete) return;
+
+    try {
+        const response = await fetch(`/api/products/${productId}`, {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            alert("Product deleted successfully!");
+            loadSellerProducts(); // Refresh product list
+        } else {
+            alert(`Failed to delete: ${result.message}`);
+        }
+    } catch (error) {
+        console.error("Delete error:", error);
+        alert("An error occurred while deleting the product.");
+    }
+};
+
+
+    // --- START THE APP ---
+    initializeApp();
+});
+</script>
+
+</body>
+</html>

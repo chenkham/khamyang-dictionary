@@ -1,0 +1,22 @@
+2025-07-30 18:07:09,831 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.154.98.73:5000
+2025-07-30 18:07:09,833 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-30 18:07:09,835 - werkzeug - INFO -  * Restarting with stat
+2025-07-30 18:07:13,272 - werkzeug - WARNING -  * Debugger is active!
+2025-07-30 18:07:13,311 - werkzeug - INFO -  * Debugger PIN: 750-141-003
+2025-07-30 18:07:17,272 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:17] "GET / HTTP/1.1" 200 -
+2025-07-30 18:07:18,526 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:18] "GET /static/script.js HTTP/1.1" 200 -
+2025-07-30 18:07:18,529 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:18] "GET /static/index.css HTTP/1.1" 200 -
+2025-07-30 18:07:22,516 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:22] "GET /login HTTP/1.1" 200 -
+2025-07-30 18:07:23,787 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:23] "GET /forgot-password HTTP/1.1" 200 -
+2025-07-30 18:07:23,842 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:23] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-30 18:07:44,102 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:44] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-07-30 18:07:44,112 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:44] "GET /dashboard HTTP/1.1" 200 -
+2025-07-30 18:07:44,156 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:44] "[36mGET /static/script.js HTTP/1.1[0m" 304 -
+2025-07-30 18:07:44,159 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:44] "[36mGET /static/index.css HTTP/1.1[0m" 304 -
+2025-07-30 18:07:48,667 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:48] "GET /dictionary HTTP/1.1" 200 -
+2025-07-30 18:07:48,714 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:48] "[36mGET /static/script.js HTTP/1.1[0m" 304 -
+2025-07-30 18:07:48,714 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:48] "GET /static/dictionary.css HTTP/1.1" 200 -
+2025-07-30 18:07:52,269 - werkzeug - INFO - 127.0.0.1 - - [30/Jul/2025 18:07:52] "GET /api/words?sort_by=tai_khamyang HTTP/1.1" 200 -

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Tai-Khamyang</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>TAI KHAMYANG</h2>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/dictionary" class="nav-link">Dictionary</a>
+                <a href="/songs" class="nav-link active">Songs</a>
+                <a href="/shopnow" class="nav-link">shop</a>
+                <a href="/about" class="nav-link">About</a>
+                <a href="/admin" class="nav-link">Admin</a>
+                <a href="/admin/logout" class="nav-link logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Header -->
+    <section class="admin-header">
+        <div class="container">
+            <h1><i class="fas fa-cogs"></i> Admin Panel</h1>
+            <p>Manage dictionary words and traditional songs</p>
+        </div>
+    </section>
+
+    <!-- Admin Content -->
+    <div class="admin-content">
+        <div class="container">
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="dictionary">
+                    <i class="fas fa-book"></i> Dictionary Management
+                </button>
+                <button class="tab-btn" data-tab="songs">
+                    <i class="fas fa-music"></i> Songs Management
+                </button>
+            </div>
+
+            <!-- Dictionary Tab -->
+            <div class="tab-content active" id="dictionary-tab">
+                <div class="section-header">
+                    <h2>Dictionary Words</h2>
+                    <button class="btn btn-primary" id="addWordBtn">
+                        <i class="fas fa-plus"></i> Add New Word
+                    </button>
+                </div>
+
+                <!-- Add/Edit Word Form -->
+                <div class="form-card" id="wordForm" style="display: none;">
+                    <div class="form-header">
+                        <h3 id="wordFormTitle">Add New Word</h3>
+                        <button class="close-form" id="closeWordForm">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <form id="wordSubmitForm">
+                        <input type="hidden" id="wordId" value="">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="taiWord">Tai-Khamyang Word *</label>
+                                <input type="text" id="taiWord" required placeholder="Enter Tai-Khamyang word">
+                            </div>
+                            <div class="form-group">
+                                <label for="englishWord">English Translation *</label>
+                                <input type="text" id="englishWord" required placeholder="Enter English translation">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="assameseWord">Assamese Translation *</label>
+                                <input type="text" id="assameseWord" required placeholder="Enter Assamese translation">
+                            </div>
+                            <div class="form-group">
+                                <label for="audioFile">Audio File (optional)</label>
+                                <input type="file" id="audioFile" accept=".mp3,.wav,.m4a,.ogg">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelWordForm">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> <span id="wordSubmitText">Add Word</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Words List -->
+                <div class="data-table">
+                    <div class="table-header">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="wordSearch" placeholder="Search words...">
+                        </div>
+                        <div class="table-info">
+                            <span id="wordsCount">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="wordsTable">
+                            <thead>
+                                <tr>
+                                    <th>Tai-Khamyang</th>
+                                    <th>English</th>
+                                    <th>Assamese</th>
+                                    <th>Audio</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wordsTableBody">
+                                <!-- Words will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Songs Tab -->
+            <div class="tab-content" id="songs-tab">
+                <div class="section-header">
+                    <h2>Traditional Songs</h2>
+                    <button class="btn btn-primary" id="addSongBtn">
+                        <i class="fas fa-plus"></i> Add New Song
+                    </button>
+                </div>
+
+                <!-- Add/Edit Song Form -->
+                <div class="form-card" id="songForm" style="display: none;">
+                    <div class="form-header">
+                        <h3 id="songFormTitle">Add New Song</h3>
+                        <button class="close-form" id="closeSongForm">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <form id="songSubmitForm">
+                        <input type="hidden" id="songId" value="">
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="songTitle">Song Title *</label>
+                                <input type="text" id="songTitle" required placeholder="Enter song title">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="songDescription">Description</label>
+                                <textarea id="songDescription" rows="4" placeholder="Enter song description..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="songFile">Audio File</label>
+                                <input type="file" id="songFile" accept=".mp3,.wav,.m4a,.ogg">
+                                <small class="file-hint">Upload MP3, WAV, M4A, or OGG files</small>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelSongForm">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> <span id="songSubmitText">Add Song</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Songs List -->
+                <div class="data-table">
+                    <div class="table-header">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="songSearch" placeholder="Search songs...">
+                        </div>
+                        <div class="table-info">
+                            <span id="songsCount">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="songsTable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Audio File</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="songsTableBody">
+                                <!-- Songs will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <div class="notification-content">
+            <i class="notification-icon"></i>
+            <span class="notification-text"></span>
+        </div>
+    </div>
+
+    <script>
+        // Admin JavaScript
+        let allWords = [];
+        let allSongs = [];
+        let currentEditingWord = null;
+        let currentEditingSong = null;
+
+        // Initialize admin panel
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTabs();
+            loadWords();
+            loadSongs();
+            setupForms();
+            setupSearch();
+        });
+
+        // Tab Management
+        function setupTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+
+                    // Update active tab button
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Update active tab content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId + '-tab') {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+        }
+
+        // Add confirmation for logout
+        document.querySelectorAll('.logout-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to logout?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Load Words
+        async function loadWords() {
+            try {
+                const response = await fetch('/api/words');
+                allWords = await response.json();
+                displayWords(allWords);
+                updateWordsCount();
+            } catch (error) {
+                showNotification('Error loading words', 'error');
+            }
+        }
+
+        // Load Songs
+        async function loadSongs() {
+            try {
+                const response = await fetch('/api/songs');
+                allSongs = await response.json();
+                displaySongs(allSongs);
+                updateSongsCount();
+            } catch (error) {
+                showNotification('Error loading songs', 'error');
+            }
+        }
+
+        // Display Words
+function displayWords(words) {
+    const tbody = document.getElementById('wordsTableBody');
+    tbody.innerHTML = words.map(word => `
+        <tr>
+            <td class="tai-word">${word.tai_khamyang}</td>
+            <td>${word.english}</td>
+            <td>${word.assamese}</td>
+            <td>
+                ${word.has_audio && word.audio_file_url ?
+                    `<button class="btn-icon" onclick="playWordAudio('${word.audio_file_url}')" title="Play audio">
+                        <i class="fas fa-play"></i>
+                    </button>` :
+                    '<span class="no-audio">No audio</span>'
+                }
+            </td>
+            <td class="actions">
+                <button class="btn-icon edit" onclick="editWord('${word.id}')" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon delete" onclick="deleteWord('${word.id}')" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Display Songs
+function displaySongs(songs) {
+    const tbody = document.getElementById('songsTableBody');
+    tbody.innerHTML = songs.map(song => `
+        <tr>
+            <td class="song-title">${song.title}</td>
+            <td class="song-desc">${song.description || 'No description'}</td>
+            <td>
+                ${song.file_url ? `
+                    <button class="btn-icon" onclick="playSong('${song.file_url}')" title="Play song">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <small>${song.file_url.split('/').pop()}</small>
+                ` : '<span class="no-audio">No file</span>'}
+            </td>
+            <td class="actions">
+                <button class="btn-icon edit" onclick="editSong('${song.id}')" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon delete" onclick="deleteSong('${song.id}')" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+        // Setup Forms
+        function setupForms() {
+            // Word form
+            document.getElementById('addWordBtn').addEventListener('click', () => openWordForm());
+            document.getElementById('closeWordForm').addEventListener('click', () => closeWordForm());
+            document.getElementById('cancelWordForm').addEventListener('click', () => closeWordForm());
+            document.getElementById('wordSubmitForm').addEventListener('submit', submitWord);
+
+            // Song form
+            document.getElementById('addSongBtn').addEventListener('click', () => openSongForm());
+            document.getElementById('closeSongForm').addEventListener('click', () => closeSongForm());
+            document.getElementById('cancelSongForm').addEventListener('click', () => closeSongForm());
+            document.getElementById('songSubmitForm').addEventListener('submit', submitSong);
+        }
+
+        // Setup Search
+        function setupSearch() {
+            document.getElementById('wordSearch').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const filtered = allWords.filter(word =>
+                    word.tai_khamyang.toLowerCase().includes(searchTerm) ||
+                    word.english.toLowerCase().includes(searchTerm) ||
+                    word.assamese.toLowerCase().includes(searchTerm)
+                );
+                displayWords(filtered);
+            });
+
+            document.getElementById('songSearch').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const filtered = allSongs.filter(song =>
+                    song.title.toLowerCase().includes(searchTerm) ||
+                    (song.description && song.description.toLowerCase().includes(searchTerm))
+                );
+                displaySongs(filtered);
+            });
+        }
+
+        // Word Form Functions
+        function openWordForm(word = null) {
+            currentEditingWord = word;
+            const form = document.getElementById('wordForm');
+            const title = document.getElementById('wordFormTitle');
+            const submitText = document.getElementById('wordSubmitText');
+
+            if (word) {
+                title.textContent = 'Edit Word';
+                submitText.textContent = 'Update Word';
+                document.getElementById('wordId').value = word.id;
+                document.getElementById('taiWord').value = word.tai_khamyang;
+                document.getElementById('englishWord').value = word.english;
+                document.getElementById('assameseWord').value = word.assamese;
+            } else {
+                title.textContent = 'Add New Word';
+                submitText.textContent = 'Add Word';
+                document.getElementById('wordSubmitForm').reset();
+                document.getElementById('wordId').value = '';
+            }
+
+            form.style.display = 'block';
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeWordForm() {
+            document.getElementById('wordForm').style.display = 'none';
+            currentEditingWord = null;
+        }
+
+        // Song Form Functions
+        function openSongForm(song = null) {
+            currentEditingSong = song;
+            const form = document.getElementById('songForm');
+            const title = document.getElementById('songFormTitle');
+            const submitText = document.getElementById('songSubmitText');
+
+            if (song) {
+                title.textContent = 'Edit Song';
+                submitText.textContent = 'Update Song';
+                document.getElementById('songId').value = song.id;
+                document.getElementById('songTitle').value = song.title;
+                document.getElementById('songFile').value = '';
+                document.getElementById('songDescription').value = song.description || '';
+            } else {
+                title.textContent = 'Add New Song';
+                submitText.textContent = 'Add Song';
+                document.getElementById('songSubmitForm').reset();
+                document.getElementById('songId').value = '';
+            }
+
+            form.style.display = 'block';
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeSongForm() {
+            document.getElementById('songForm').style.display = 'none';
+            currentEditingSong = null;
+        }
+
+       async function submitWord(e) {
+    e.preventDefault();
+    showLoading();
+
+    const formData = new FormData();
+    formData.append('tai_khamyang', document.getElementById('taiWord').value);
+    formData.append('english', document.getElementById('englishWord').value);
+    formData.append('assamese', document.getElementById('assameseWord').value);
+
+    const audioFile = document.getElementById('audioFile').files[0];
+    if (audioFile) {
+        // Validate file size (5MB max)
+        if (audioFile.size > 5 * 1024 * 1024) {
+            showNotification('Audio file is too large. Maximum size is 5MB.', 'error');
+            hideLoading();
+            return;
+        }
+
+        // Validate file type
+        const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4', 'audio/aac'];
+        const allowedExtensions = ['mp3', 'wav', 'ogg', 'm4a', 'aac'];
+        const fileExtension = audioFile.name.split('.').pop().toLowerCase();
+
+        if (!allowedTypes.includes(audioFile.type) && !allowedExtensions.includes(fileExtension)) {
+            showNotification('Invalid audio file format. Please use MP3, WAV, OGG, M4A, or AAC.', 'error');
+            hideLoading();
+            return;
+        }
+
+        formData.append('audio', audioFile);
+    }
+
+    try {
+        const wordId = document.getElementById('wordId').value;
+        const url = wordId ? `/api/words/${wordId}` : '/api/words';
+        const method = wordId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method: method,
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            const action = wordId ? 'updated' : 'added';
+            showNotification(`Word ${action} successfully`, 'success');
+
+            // Log audio URL for debugging
+            if (result.audio_url) {
+                console.log('Audio uploaded to:', result.audio_url);
+            }
+
+            closeWordForm();
+            loadWords();
+        } else {
+            throw new Error(result.error || 'Failed to save word');
+        }
+    } catch (error) {
+        console.error('Word submission error:', error);
+        showNotification(error.message || 'Error saving word', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+    async function testWordAudio(wordId) {
+    try {
+        const response = await fetch(`/api/words/${wordId}/audio-test`);
+        const result = await response.json();
+        console.log('Audio test result:', result);
+        return result;
+    } catch (error) {
+        console.error('Audio test error:', error);
+        return null;
+    }
+}
+
+      function handleAudioError(error, audioUrl) {
+    console.error('Audio error:', error);
+    console.log('Failed audio URL:', audioUrl);
+
+    let errorMessage = 'Cannot play audio file';
+
+    if (error.name === 'NotSupportedError') {
+        errorMessage = 'Audio format not supported by your browser';
+    } else if (error.name === 'NotAllowedError') {
+        errorMessage = 'Audio playback blocked. Please enable autoplay or click to play.';
+    } else if (error.name === 'AbortError') {
+        errorMessage = 'Audio playback was interrupted';
+    }
+
+    showNotification(errorMessage, 'error');
+}
+
+        async function submitSong(e) {
+    e.preventDefault();
+    showLoading();
+
+    const formData = new FormData();
+    formData.append('title', document.getElementById('songTitle').value);
+    formData.append('description', document.getElementById('songDescription').value);
+
+    const songFile = document.getElementById('songFile').files[0];
+    if (songFile) {
+        formData.append('audio', songFile);
+    }
+
+    try {
+        const songId = document.getElementById('songId').value;
+        const url = songId ? `/api/songs/${songId}` : '/api/songs';
+        const method = songId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method: method,
+            body: formData
+            // Don't set Content-Type header - browser will set it automatically
+        });
+
+        const result = await response.json(); // Parse JSON response
+
+        if (response.ok) {
+            showNotification(
+                songId ? 'Song updated successfully' : 'Song added successfully',
+                'success'
+            );
+            closeSongForm();
+            loadSongs();
+        } else {
+            throw new Error(result.error || 'Failed to save song');
+        }
+    } catch (error) {
+        showNotification(error.message || 'Error saving song', 'error');
+        console.error('Song submission error:', error);
+    } finally {
+        hideLoading();
+    }
+}
+
+        // Edit Functions
+        function editWord(id) {
+            const word = allWords.find(w => w.id === id);
+            if (word) {
+                openWordForm(word);
+            }
+        }
+
+        function editSong(id) {
+            const song = allSongs.find(s => s.id === id);
+            if (song) {
+                openSongForm(song);
+            }
+        }
+
+        // Delete Functions
+        async function deleteWord(id) {
+            if (!confirm('Are you sure you want to delete this word?')) return;
+
+            showLoading();
+            try {
+                const response = await fetch(`/api/words/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showNotification('Word deleted successfully', 'success');
+                    loadWords();
+                } else {
+                    throw new Error('Failed to delete word');
+                }
+            } catch (error) {
+                showNotification('Error deleting word', 'error');
+            }
+            hideLoading();
+        }
+
+        async function deleteSong(id) {
+            if (!confirm('Are you sure you want to delete this song?')) return;
+
+            showLoading();
+            try {
+                const response = await fetch(`/api/songs/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showNotification('Song deleted successfully', 'success');
+                    loadSongs();
+                } else {
+                    throw new Error('Failed to delete song');
+                }
+            } catch (error) {
+                showNotification('Error deleting song', 'error');
+            }
+            hideLoading();
+        }
+
+        // Audio Functions
+        function playWordAudio(audioUrl) {
+    try {
+        const audio = new Audio(audioUrl);
+
+        audio.addEventListener('error', (e) => {
+            handleAudioError(e.target.error, audioUrl);
+        });
+
+        audio.addEventListener('loadstart', () => {
+            console.log('Audio loading started:', audioUrl);
+        });
+
+        audio.addEventListener('canplay', () => {
+            console.log('Audio can play:', audioUrl);
+        });
+
+        audio.play().catch(error => {
+            handleAudioError(error, audioUrl);
+        });
+    } catch (error) {
+        handleAudioError(error, audioUrl);
+    }
+}
+
+        function playAudio(audioPath) {
+            const audio = new Audio(`/static/audio/${audioPath}`);
+            audio.play().catch(error => {
+                showNotification('Cannot play audio file', 'error');
+            });
+        }
+
+        function playSong(fileUrl) {
+    const audio = new Audio(fileUrl);
+    audio.play().catch(error => {
+        showNotification('Cannot play song: ' + error.message, 'error');
+    });
+}
+
+        // Update Counts
+        function updateWordsCount() {
+            document.getElementById('wordsCount').textContent = `${allWords.length} words`;
+        }
+
+        function updateSongsCount() {
+            document.getElementById('songsCount').textContent = `${allSongs.length} songs`;
+        }
+
+        // Utility Functions
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const icon = notification.querySelector('.notification-icon');
+            const text = notification.querySelector('.notification-text');
+
+            // Set icon based on type
+            let iconClass = 'fas fa-info-circle';
+            if (type === 'success') iconClass = 'fas fa-check-circle';
+            else if (type === 'error') iconClass = 'fas fa-exclamation-circle';
+            else if (type === 'warning') iconClass = 'fas fa-exclamation-triangle';
+
+            icon.className = `notification-icon ${iconClass}`;
+            text.textContent = message;
+            notification.className = `notification ${type} show`;
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

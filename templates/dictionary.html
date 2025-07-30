@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dictionary - Tai-Khamyang</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dictionary.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sort-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .sort-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .sort-btn.active {
+            background: #e74c3c;
+        }
+
+        .alphabet-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .alphabet-letter {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ecf0f1;
+            color: #34495e;
+            text-decoration: none;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .alphabet-letter:hover {
+            background: #3498db;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .alphabet-letter.active {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            margin: 30px 0 15px 0;
+            border-radius: 25px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .word-group {
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .sort-options {
+                justify-content: center;
+            }
+
+            .alphabet-nav {
+                gap: 3px;
+            }
+
+            .alphabet-letter {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>TAI KHAMYANG</h2>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/dictionary" class="nav-link">Dictionary</a>
+                <a href="/songs" class="nav-link active">Songs</a>
+                <a href="/shopnow" class="nav-link">shop</a>
+                <a href="/about" class="nav-link">About</a>
+                <a href="/admin" class="nav-link">Admin</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dictionary Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-book"></i> Dictionary</h1>
+            <p>Search for words in Tai-Khamyang, English, or Assamese</p>
+        </div>
+    </section>
+
+    <!-- Dictionary Content -->
+    <section class="dictionary-section">
+        <div class="container">
+            <!-- Search Box -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Type to search words..." autocomplete="off">
+                    <button id="clearSearch" class="clear-btn" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="search-info">
+                    <span id="searchResults">Loading words...</span>
+                </div>
+            </div>
+
+            <!-- Sort Options -->
+            <div class="sort-options">
+                <span style="font-weight: bold; margin-right: 10px;">Sort by:</span>
+                <button class="sort-btn active" data-sort="tai_khamyang">Tai-Khamyang A-Z</button>
+                <button class="sort-btn" data-sort="english">English A-Z</button>
+                <button class="sort-btn" data-sort="assamese">Assamese A-Z</button>
+            </div>
+
+            <!-- Alphabet Navigation -->
+            <div class="alphabet-nav" id="alphabetNav">
+                <!-- Will be populated dynamically -->
+            </div>
+
+            <!-- Dictionary Grid -->
+            <div class="dictionary-grid" id="dictionaryGrid">
+                <!-- Words will be loaded here dynamically -->
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading dictionary...</p>
+            </div>
+
+            <!-- No Results -->
+            <div class="no-results" id="noResults" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>No words found</h3>
+                <p>Try searching with different terms</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Audio Element for pronunciations -->
+    <audio id="audioPlayer" preload="none"></audio>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Tai-Khamyang Dictionary</h3>
+                    <p>Preserving our culture through digital innovation (●'◡'●)</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/dictionary">Dictionary</a></li>
+                        <li><a href="/songs">Songs</a></li>
+                        <li><a href="/about">About Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Tips</h4>
+                    <p>Search in any language - Tai-Khamyang, English, or Assamese. Click the speaker icon to hear pronunciations.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Tai-Khamyang Dictionary. Made with ❤ for our community in a hope to preserve our culture. </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Dictionary specific JavaScript
+        let allWords = [];
+        let filteredWords = [];
+        let currentSort = 'tai_khamyang';
+
+        // Load dictionary on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDictionary();
+            setupSearch();
+            setupSorting();
+        });
+
+        async function loadDictionary(sortBy = 'tai_khamyang') {
+            try {
+                const response = await fetch(`/api/words?sort_by=${sortBy}`);
+                allWords = await response.json();
+                filteredWords = [...allWords];
+                currentSort = sortBy;
+                displayWords(filteredWords);
+                createAlphabetNav(filteredWords, sortBy);
+                updateSearchResults();
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading dictionary:', error);
+                showError();
+            }
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const clearButton = document.getElementById('clearSearch');
+
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+
+                if (searchTerm === '') {
+                    filteredWords = [...allWords];
+                    clearButton.style.display = 'none';
+                } else {
+                    filteredWords = allWords.filter(word =>
+                        word.tai_khamyang.toLowerCase().includes(searchTerm) ||
+                        word.english.toLowerCase().includes(searchTerm) ||
+                        word.assamese.toLowerCase().includes(searchTerm)
+                    );
+                    clearButton.style.display = 'block';
+                }
+
+                displayWords(filteredWords);
+                createAlphabetNav(filteredWords, currentSort);
+                updateSearchResults();
+            });
+
+            clearButton.addEventListener('click', function() {
+                searchInput.value = '';
+                filteredWords = [...allWords];
+                displayWords(filteredWords);
+                createAlphabetNav(filteredWords, currentSort);
+                updateSearchResults();
+                clearButton.style.display = 'none';
+                searchInput.focus();
+            });
+        }
+
+        function setupSorting() {
+            const sortButtons = document.querySelectorAll('.sort-btn');
+
+            sortButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sortBy = this.dataset.sort;
+
+                    // Update active button
+                    sortButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Reload dictionary with new sorting
+                    loadDictionary(sortBy);
+                });
+            });
+        }
+
+        function createAlphabetNav(words, sortBy) {
+            const alphabetNav = document.getElementById('alphabetNav');
+            const letters = new Set();
+
+            words.forEach(word => {
+                const firstLetter = word[sortBy].charAt(0).toUpperCase();
+                letters.add(firstLetter);
+            });
+
+            const sortedLetters = Array.from(letters).sort();
+
+            alphabetNav.innerHTML = sortedLetters.map(letter =>
+                `<a href="#letter-${letter}" class="alphabet-letter" data-letter="${letter}">${letter}</a>`
+            ).join('');
+        }
+
+        function displayWords(words) {
+            const grid = document.getElementById('dictionaryGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (words.length === 0) {
+                grid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'block';
+            noResults.style.display = 'none';
+
+            // Group words by first letter
+            const groupedWords = groupWordsByLetter(words, currentSort);
+
+            grid.innerHTML = Object.keys(groupedWords)
+                .sort()
+                .map(letter => `
+                    <div class="word-group" id="letter-${letter}">
+                        <div class="section-header">${letter}</div>
+                        <div class="dictionary-grid">
+                            ${groupedWords[letter].map(word => `
+                                <div class="word-card" data-word-id="${word.id}">
+                                    <div class="word-header">
+                                        <h3 class="tai-word">${word.tai_khamyang}</h3>
+                                        ${word.audio_file_url ? `<button class="audio-btn" onclick="playAudio('${word.audio_file_url}')" title="Play pronunciation">
+                                            <i class="fas fa-volume-up"></i>
+                                           </button>` : ''}
+                                    </div>
+                                    <div class="word-meanings">
+                                        <div class="meaning">
+                                            <span class="lang-label">English:</span>
+                                            <span class="meaning-text">${word.english}</span>
+                                        </div>
+                                        <div class="meaning">
+                                            <span class="lang-label">অসমীয়া:</span>
+                                            <span class="meaning-text">${word.assamese}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+            // Add smooth scrolling to alphabet navigation
+            document.querySelectorAll('.alphabet-letter').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        }
+
+        function groupWordsByLetter(words, sortBy) {
+            const grouped = {};
+
+            words.forEach(word => {
+                const firstLetter = word[sortBy].charAt(0).toUpperCase();
+                if (!grouped[firstLetter]) {
+                    grouped[firstLetter] = [];
+                }
+                grouped[firstLetter].push(word);
+            });
+
+            return grouped;
+        }
+
+        function updateSearchResults() {
+            const resultsSpan = document.getElementById('searchResults');
+            const total = allWords.length;
+            const showing = filteredWords.length;
+
+            if (showing === total) {
+                resultsSpan.textContent = `Showing all ${total} words`;
+            } else {
+                resultsSpan.textContent = `Showing ${showing} of ${total} words`;
+            }
+        }
+
+        function playAudio(audioPath) {
+    // Check if it's a full URL (Firebase Storage)
+    if (audioPath.startsWith('http')) {
+        const audioPlayer = document.getElementById('audioPlayer');
+        audioPlayer.src = audioPath;
+        audioPlayer.play().catch(error => {
+            console.log('Audio playback failed:', error);
+        });
+    }
+    // Otherwise assume it's a local file
+    else {
+        const audioPlayer = document.getElementById('audioPlayer');
+        audioPlayer.src = `/static/audio/${audioPath}`;
+        audioPlayer.play().catch(error => {
+            console.log('Audio playback failed:', error);
+        });
+    }
+}
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError() {
+            const loading = document.getElementById('loading');
+            loading.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="color: #e74c3c; font-size: 2rem; margin-bottom: 10px;"></i>
+                <p>Failed to load dictionary. Please refresh the page.</p>
+            `;
+        }
+    </script>
+</body>
+</html>

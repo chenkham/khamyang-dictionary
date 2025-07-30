@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Taikhamyang — The Golden Legacy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+<!--      nav bar-->
+     :root {
+  --primary-color: #2c5530;       /* your shop primary dark green */
+  --primary-light: #4a7c59;
+  --text-primary: #2c3e50;
+  --text-light: #ecf0f1;
+  --nav-bg: rgba(255, 255, 255, 0.95);
+  --nav-link-color: var(--text-primary);
+  --nav-link-hover: var(--primary-color);
+  --hamburger-color: var(--text-primary);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Navbar */
+
+.navbar {
+  background: var(--nav-bg);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  transition: var(--transition);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+}
+
+/* Logo */
+.nav-logo h2 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  user-select: none;
+}
+
+/* Menu */
+.nav-menu {
+  display: flex;
+  list-style: none;
+  gap: 30px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--nav-link-color);
+  font-weight: 500;
+  transition: var(--transition);
+  position: relative;
+  padding: 10px 0;
+  user-select: none;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--nav-link-hover);
+}
+
+/* underline effect */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background: var(--primary-color);
+  transition: var(--transition);
+  transform: translateX(-50%);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* Admin link style */
+.admin-link {
+  background: var(--primary-color);
+  color: var(--text-light) !important;
+  padding: 10px 20px !important;
+  border-radius: 25px;
+  transition: var(--transition);
+}
+
+.admin-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(74, 124, 89, 0.6);
+}
+
+.admin-link::after {
+  display: none;
+}
+
+/* Hamburger - hidden on desktop */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+  width: 25px;
+  height: 22px;
+  justify-content: center;
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background: var(--hamburger-color);
+  border-radius: 3px;
+  transition: var(--transition);
+  display: block;
+}
+    :root {
+      --primary: #18b8b3;
+      --secondary: #f9b233;
+      --accent: #3296e6;
+      --bg: #fafbfc;
+      --header-bg: linear-gradient(90deg, #36d1c4 25%, #18456b 90%);
+      --card-bg: rgba(255,255,255,0.97);
+      --gray: #606060;
+      --box: 0 10px 45px 0 rgba(15,60,100,0.13);
+      --rad: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg);
+      font-family: 'Lato', Helvetica, Arial, sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      /* cool geometric overlay */
+      background: url('https://www.transparenttextures.com/patterns/diamond-upholstery.png'), var(--bg);
+    }
+    header {
+      background: var(--header-bg);
+      color: #fff;
+      text-align: center;
+      padding: 2.8rem 1rem 2rem 1rem;
+      border-radius: 0 0 var(--rad) var(--rad);
+      position: relative;
+      overflow: hidden;
+    }
+    header .overlay {
+      position: absolute;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1050&q=80') center/cover;
+      opacity: 0.25;
+      z-index: 0;
+      pointer-events: none;
+    }
+    header .shine-star {
+      display: inline-block;
+      color: #fff700;
+      font-size: 2rem;
+      vertical-align: middle;
+      margin: 0 0.3em;
+      animation: shine 3s infinite ease-in-out;
+      filter: drop-shadow(0 0 22px #ffd70088);
+    }
+    @keyframes shine {
+      0%, 100% { transform: scale(1) rotate(-10deg);}
+      50% { transform: scale(1.2) rotate(15deg);}
+    }
+    header h1 {
+      font-size: 3.2rem;
+      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+      margin: 0.4em 0 0.2em 0;
+      letter-spacing: 2px;
+      font-weight: 700;
+      z-index: 1;
+      position: relative;
+    }
+    header p {
+      font-size: 1.5em;
+      font-style: italic;
+      color: #fff0a8;
+      text-shadow: 0 1px 14px #0003;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-family: 'Lato', sans-serif;
+      z-index: 1;
+      position: relative;
+    }
+    .navbar {
+      width: 100%;
+      margin-top: 0.5em;
+      display: flex;
+      justify-content: center;
+      gap: 2.2rem;
+      z-index: 2;
+      position: relative;
+    }
+    .navbar a {
+      color: #fffbe2;
+      text-decoration: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+      padding: 0.2em 0.5em;
+      border-radius: 5px;
+      transition: background 0.25s, color 0.2s;
+    }
+    .navbar a:hover, .navbar a.active {
+      background: var(--secondary);
+      color: #292e36;
+    }
+    main {
+      max-width: 1050px;
+      margin: 2rem auto 0 auto;
+      padding: 2.5rem 2.2rem 3vh 2.2rem;
+      background: var(--card-bg);
+      border-radius: var(--rad);
+      box-shadow: var(--box);
+      font-size: 1.15rem;
+      line-height: 1.75;
+      position: relative;
+      z-index: 1;
+      animation: fadeInMain 1.1s;
+    }
+    @keyframes fadeInMain {
+      from { opacity: 0; transform: translateY(45px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    h2 {
+      color: var(--primary);
+      font-size: 2rem;
+      margin-top: 2.6rem;
+      text-align: center;
+      letter-spacing: 1.2px;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .intro-fact {
+      background: linear-gradient(90deg,#def9f7 70%, #ffecb7 100%);
+      border-left: 7px solid var(--secondary);
+      padding: 1.2rem 1.1rem;
+      margin: 2rem 0;
+      font-style: italic;
+      font-size: 1.08rem;
+      font-family: 'Lato', sans-serif;
+      border-radius: 9px;
+      box-shadow: 0 1px 12px 0 #f9b23322;
+    }
+    section {
+      margin-bottom: 3.2rem;
+    }
+    /* Cards for highlights */
+    .highlight-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 2.2rem;
+      margin: 2.3rem 0 1.2rem 0;
+    }
+    .card {
+      background: linear-gradient(120deg, #e1faf9 60%, #ffeacb 100%);
+      box-shadow: 0 2.5px 9px rgba(50,184,211,0.13);
+      border-radius: 15px;
+      padding: 1.6em 1.4em;
+      width: 320px;
+      min-width: 240px;
+      flex: 1;
+      margin-bottom: 1.1rem;
+      font-size: 1.09rem;
+      text-align: center;
+      transition: transform 0.18s cubic-bezier(.4,2,.6,1);
+    }
+    .card:hover {
+      transform: scale(1.035) translateY(-4px);
+      box-shadow: 0 8px 26px #aadef822;
+    }
+    .card .fa-solid, .card .fa-brands {
+      font-size: 1.7em;
+      margin-bottom: 0.7em;
+      color: var(--secondary);
+    }
+    /* Timeline for migration */
+    .timeline {
+      margin: 2.5rem 0 0 0;
+      position: relative;
+      padding-left: 2.5rem;
+    }
+    .timeline:before {
+      content: "";
+      position: absolute;
+      left: 25px;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: linear-gradient(#229d92 80%, #fff897 120%);
+      border-radius: 4px;
+      z-index: 0;
+    }
+    .timeline-event {
+      position: relative;
+      margin-bottom: 2.2rem;
+      padding-left: 2.7rem;
+    }
+    .timeline-event:last-child { margin-bottom: 0; }
+    .timeline-event::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 5px;
+      width: 32px;
+      height: 32px;
+      background: var(--secondary);
+      border-radius: 50%;
+      box-shadow: 0 2px 6px #eee3;
+      border: 4px solid #17cfbe;
+    }
+    .timeline-event .year {
+      font-weight: bold;
+      color: var(--accent);
+      font-size: 1.15em;
+      margin-right: 0.5em;
+    }
+    .timeline-event span {
+      font-weight: bold;
+      color: var(--primary);
+    }
+    /* Table styles enhanced */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.7rem 0 2.2rem 0;
+      background: #f8f9fb;
+      box-shadow: 0 0 12px #eef4f5bb;
+      border-radius: 9px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #c6e6f3;
+      text-align: left;
+      padding: 1rem 1.1rem;
+      font-size: 1.07rem;
+    }
+    th {
+      background: #e6fbff;
+      color: #14686e;
+      font-weight: bold;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.15rem;
+    }
+    td {
+      color: #313d3d;
+      vertical-align: top;
+    }
+    /* Hero Profile grid */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+      gap: 1.8rem;
+      margin-top: 2.6rem;
+    }
+    .profile-card {
+      background: linear-gradient(120deg, #f9ffc4 35%, #e1faf9 100%);
+      border-radius: 12px;
+      box-shadow: 0 3px 13px #c8eddb22;
+      padding: 1.3em 1em 1.6em 1em;
+      text-align: center;
+      transition: box-shadow 0.2s;
+      font-size: 1rem;
+    }
+    .profile-card:hover {
+      box-shadow: 0 8px 22px #c8eaff44;
+    }
+    .profile-card img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 0.7em;
+      box-shadow: 0 3px 11px #ffd88036;
+      border: 3px solid #fad17c55;
+    }
+    .profile-card h4 {
+      margin: 0.4em 0 0.1em 0;
+      color: var(--primary);
+      font-size: 1.14em;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .profile-card span.role {
+      color: #b2851d;
+      font-style: italic;
+      font-size: 0.97em;
+      margin-bottom: 0.5em;
+      display: block;
+    }
+    /* Animative quote section */
+    .golden-quote {
+      font-size: 1.24em;
+      margin: 2.2rem 0;
+      padding: 1.2em 1.6em;
+      background: linear-gradient(90deg,#fbf7b9bb 40%, #defff788 95%);
+      border-left: 7px solid var(--secondary);
+      color: #a38529;
+      font-family: 'Montserrat', sans-serif;
+      box-shadow: 0 2px 15px #ffeaa344;
+      border-radius: 10px;
+      text-align: center;
+      animation: fadeInMain 1.8s;
+    }
+    /* Gallery styles */
+    .gallery {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      margin: 2.1rem 0;
+      justify-content: center;
+    }
+    .gallery img {
+      width: 250px;
+      height: 160px;
+      border-radius: 13px;
+      object-fit: cover;
+      box-shadow: 0 7px 28px #b6dcfa37;
+      transition: transform 0.19s;
+      cursor: pointer;
+    }
+    .gallery img:hover {
+      transform: scale(1.08) rotate(-2deg);
+      box-shadow: 0 13px 46px #ffecb777;
+    }
+    /* Responsive tweaks */
+    @media (max-width: 850px) {
+      main { padding: 1.2rem;}
+      .highlight-cards { flex-direction: column; gap: 1em;}
+      .gallery img { width: 98vw; max-width: 400px;}
+      .timeline { padding-left: 0.5rem;}
+      .timeline-event { padding-left: 1.5rem;}
+      .profile-grid { grid-template-columns: 1fr;}
+    }
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 1rem;
+      padding: 2em 0 1.7em 0;
+      color: #07ad81;
+      background: #eafbf8;
+      margin: 0;
+      border-radius: 0 0 var(--rad) var(--rad);
+      box-shadow: 0 -2px 18px #c7ede7aa;
+    }
+    .social-links {
+      margin: 1.1em 0;
+    }
+    .social-links a {
+      color: var(--primary);
+      margin: 0 0.3em;
+      font-size: 1.35em;
+      text-decoration: none;
+      transition: color 0.22s;
+    }
+    .social-links a:hover { color: var(--secondary);}
+    /* Floating gold particle effect for wow */
+    .gold-particles {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      min-width: 100vw; min-height: 100vh;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: linear-gradient(120deg,#ffdb6f 60%, #ffeac1 100%);
+      opacity: 0.75;
+      width: 9px; height: 9px;
+      box-shadow: 0 0 15px #ffecb7bb;
+      animation: particleFly 19s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes particleFly {
+      from {
+        transform: translateY(105vh) scale(.7) rotate(0deg);
+        opacity: 0.8;
+      }
+      30% {
+        opacity: 1;
+      }
+      to {
+        transform: translateY(-7vh) scale(1.3) rotate(360deg);
+        opacity: 0.1;
+      }
+    }
+       /* Mobile Styles */
+  @media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .nav-menu {
+    position: fixed;
+    left: -100%;
+    top: 70px;
+    flex-direction: column;
+    background-color: var(--nav-bg);
+    width: 100%;
+    text-align: center;
+    transition: var(--transition);
+    box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
+    padding: 30px 0;
+    gap: 20px;
+    backdrop-filter: blur(10px);
+    z-index: 999;
+  }
+
+  .nav-menu.active {
+    left: 0;
+  }
+
+  .nav-link {
+    font-size: 1.2rem;
+    padding: 0.8rem 1rem;
+    color: var(--text-primary);
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--primary-color);
+    background: transparent;
+  }
+
+  /* Hamburger animation */
+  .hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+  }
+}
+
+/* Add padding-top to main content to avoid navbar overlay */
+main {
+  padding-top: 80px; /* height of navbar + some spacing */
+}
+  </style>
+</head>
+<body>
+
+   <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <h2>TAI KHAMYANG</h2>
+      </div>
+      <div class="nav-menu" id="navMenu">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/dictionary" class="nav-link">Dictionary</a>
+        <a href="/songs" class="nav-link">Songs</a>
+        <a href="/shopnow" class="nav-link">Shop</a>
+        <a href="/about" class="nav-link active">About</a>
+        <a href="/admin" class="nav-link">Admin</a>
+        <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+      </div>
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <header>
+  <div class="overlay"></div>
+  <span class="shine-star"><i class="fa-solid fa-star"></i></span>
+  <h1>About Taikhamyang</h1>
+  <p>“The People of Gold” — A Living Tai Heritage</p>
+</header>
+
+  <main>
+    <div class="intro-fact">
+      Did you know? The word “Taikhamyang” comes from ‘kham’ (gold) and ‘yang’ (to have), literally “those who have gold.” The Taikhamyang, also called Shyam, are a unique Tai group in Northeast India, celebrated for their dazzling legacy, colors, and woven spirit.
+    </div>
+    <section>
+      <h2>Who Are the Taikhamyang?</h2>
+      <div class="highlight-cards">
+        <div class="card">
+          <i class="fa-solid fa-people-group"></i>
+          <b>Ethnic Roots</b>
+          <div>The Taikhamyang are a proud branch of the Tai ethnic family, with ties reaching across Southeast Asia and deep historical threads to Myanmar and beyond[4].</div>
+        </div>
+        <div class="card">
+          <i class="fa-solid fa-buddha"></i>
+          <b>Faith & Beliefs</b>
+          <div>Followers of Theravada Buddhism, their vibrant viharas are centers of spirituality and community learning[2][4].</div>
+        </div>
+        <div class="card">
+          <i class="fa-solid fa-leaf"></i>
+          <b>Homeland</b>
+          <div>Mainly in Assam’s Tinsukia, Jorhat, Golaghat, and Sivasagar districts, and parts of Arunachal Pradesh[2][4].</div>
+        </div>
+        <div class="card">
+          <i class="fa-solid fa-language"></i>
+          <b>Language</b>
+          <div>Original language is Tai Khamyang (endangered); day-to-day life now mostly in Assamese. Efforts for revival continue[5][8].</div>
+        </div>
+      </div>
+    </section>
+    <section id="history">
+      <h2>Our Journey — History & Migration</h2>
+      <div class="timeline">
+        <div class="timeline-event">
+          <span class="year">1300s</span> — <span>Ancient Migration:</span> Ancestors migrated from the upper Irrawaddy valley in Myanmar, moving towards Assam.
+        </div>
+        <div class="timeline-event">
+          <span class="year">1400s-1600s</span> — <span>Settlement Era:</span> Established vibrant hamlets along the rivers and forests of Upper Assam.
+        </div>
+        <div class="timeline-event">
+          <span class="year">1800s-1900s</span> — <span>Struggles & Resilience:</span> Political turmoil, weaving, and Buddhist traditions hold the community together.
+        </div>
+        <div class="timeline-event">
+          <span class="year">Modern Day</span> — <span>Revival & Pride:</span> Despite language shift and urbanization, Taikhamyangs strive to preserve their golden identity.
+        </div>
+      </div>
+      <div class="golden-quote">
+        “We are the living flame of a thousand-year heritage—united by family, faith, tradition, and an enduring golden spirit.”
+      </div>
+    </section>
+    <section id="culture">
+      <h2>Richness of Our Culture</h2>
+      <table>
+        <tr>
+          <th>Aspect</th>
+          <th>Taikhamyang Feature</th>
+        </tr>
+        <tr>
+          <td>Language</td>
+          <td>Tai Khamyang (endangered, under revival); Assamese is widely spoken[5][8].</td>
+        </tr>
+        <tr>
+          <td>Religion</td>
+          <td>Theravada Buddhism, with strong ties to Tai Khamti and other Tai tribes[2][4].</td>
+        </tr>
+        <tr>
+          <td>Traditional Occupation</td>
+          <td>Rice farming, handloom weaving, construction of chang ghor (stilt-houses)[1].</td>
+        </tr>
+        <tr>
+          <td>Population</td>
+          <td>Approx. 7,000, mainly in Assam and Arunachal Pradesh[2][4].</td>
+        </tr>
+        <tr>
+          <td>Festivals</td>
+          <td>Buddha Purnima, Poi Sangken (Water Festival), and local fairs are celebrated with vibrant rituals, music, and dance.</td>
+        </tr>
+        <tr>
+          <td>Clothing & Art</td>
+          <td>Women excel at weaving; intricate floral patterns and colors reflect identity. Community handlooms and traditional motifs are treasured[1][3].</td>
+        </tr>
+        <tr>
+          <td>Folklore & Wisdom</td>
+          <td>Oral tales, proverbs, and riddles are handed down through generations to instill values and history[3].</td>
+        </tr>
+        <tr>
+          <td>Architecture</td>
+          <td>Stilt houses (chang ghar) with granaries, clay walls, and cane-thatch roofs[1].</td>
+        </tr>
+        <tr>
+          <td>Spiritual Heart</td>
+          <td>Viharas (Buddhist monasteries) as centers for faith, learning, and community cohesion[7].</td>
+        </tr>
+      </table>
+      <div class="highlight-cards">
+        <div class="card">
+          <i class="fa-brands fa-envira"></i>
+          Sustainable living — Houses on stilts, bamboo crafts, and eco-conscious traditions.
+        </div>
+        <div class="card">
+          <i class="fa-solid fa-fan"></i>
+          Multilingual legacy — Roots in Tai, present in Assamese, with ongoing revitalization projects.
+        </div>
+        <div class="card">
+          <i class="fa-solid fa-burst"></i>
+          Festivals of light, song, and life — Joyful celebrations unite the people!
+        </div>
+      </div>
+    </section>
+    <section id="team">
+      <h2>Community Heroes</h2>
+      <div class="profile-grid">
+        <div class="profile-card">
+          <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Village Elder">
+          <h4>Madhu Singphoo</h4>
+          <span class="role">Village Elder & Historian</span>
+          Keeper of oral history, bridging the past and future of Taikhamyang.
+        </div>
+        <div class="profile-card">
+          <img src="https://randomuser.me/api/portraits/women/66.jpg" alt="Master Weaver">
+          <h4>Sopaya Phaomei</h4>
+          <span class="role">Master Weaver</span>
+          Famed for her legendary floral weaves and community teaching.
+        </div>
+        <div class="profile-card">
+          <img src="https://randomuser.me/api/portraits/men/40.jpg" alt="Buddhist Monk">
+          <h4>Bhante Ratna</h4>
+          <span class="role">Buddhist Monk</span>
+          Spiritual guide at the Charaideo vihara.
+        </div>
+        <div class="profile-card">
+          <img src="https://randomuser.me/api/portraits/women/79.jpg" alt="Youth Leader">
+          <h4>Uma Phukan</h4>
+          <span class="role">Youth Mentor</span>
+          Drives youth programs for language revival and digital heritage.
+        </div>
+      </div>
+    </section>
+    <section id="gallery">
+      <h2>Photo Gallery</h2>
+      <div class="gallery">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80" alt="Assam stilt village">
+        <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&q=80" alt="Monastery interior">
+        <img src="https://images.unsplash.com/photo-1519122362580-9531e2fa1c77?w=800&q=80" alt="Traditional weaving">
+        <img src="https://images.unsplash.com/photo-1525011268546-bf3f9b007f6b?w=800&q=80" alt="Community festival">
+      </div>
+    </section>
+    <section>
+      <h2>Why We Shine</h2>
+      <ul>
+        <li><b>Resilience:</b> Despite challenges, Taikhamyang have preserved their core practices and identity.</li>
+        <li><b>Harmony:</b> Known for peaceful coexistence and inter-community friendships.</li>
+        <li><b>Diversity:</b> Their unique blend of Tai and Assamese influences make them a rich and rare tapestry in the region.</li>
+        <li><b>Living Heritage:</b> Community halls, home rituals, and art keep the golden tradition glowing.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Preserving Our Golden Legacy</h2>
+      <div class="golden-quote">
+        The Taikhamyang story is more than heritage — it’s an ongoing celebration of hope, spirit, and golden unity.<br/>
+        <b>Join us in keeping the flame alive!</b>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© 2025 Taikhamyang Community | Designed with <i class="fa-solid fa-heart" style="color:#f47373"></i> and golden pride.</span>
+    <div class="social-links">
+      <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+      <a href="#"><i class="fa-brands fa-twitter"></i></a>
+      <a href="#"><i class="fa-brands fa-instagram"></i></a>
+    </div>
+  </footer>
+  <!-- Gold floating particles -->
+  <div class="gold-particles" id="particles"></div>
+  <script>
+
+    const hamburger = document.getElementById('hamburger');
+const navMenu = document.getElementById('navMenu');
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('active');
+  navMenu.classList.toggle('active');
+});
+
+// Optional: Close nav menu on link click (especially useful on mobile)
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    hamburger.classList.remove('active');
+    navMenu.classList.remove('active');
+  });
+});
+
+    // Animated gold star flicker
+    setInterval(() => {
+      document.querySelectorAll('.shine-star').forEach(star => {
+        star.style.filter = `drop-shadow(0 0 ${Math.random()*30+12}px #ffd700)`;
+      });
+    }, 1000);
+
+    // Floating gold particle animation (50+ for visual richness)
+    const nparticles = 55;
+    for(let i=0;i<nparticles;i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const left = Math.random() * window.innerWidth * .92;
+      const delay = Math.random() * 18;
+      const duration = 18 + Math.random()*12;
+      const size = 7 + Math.random()*14;
+      p.style.left = `${left}px`;
+      p.style.top = `${Math.random()*window.innerHeight}px`;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.animationDelay = `${delay}s`;
+      p.style.animationDuration = `${duration}s`;
+      document.getElementById('particles').appendChild(p);
+    }
+
+    // Smooth scroll for navbar
+    document.querySelectorAll('.navbar a[href^="#"]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({behavior:"smooth"});
+      });
+    });
+
+    // Gallery: Modal effect with dynamic zoom
+    document.querySelectorAll('.gallery img').forEach(img => {
+      img.addEventListener('click', function() {
+        const modal = document.createElement('div');
+        modal.style = 'position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.83);display:flex;align-items:center;justify-content:center;';
+        const big = document.createElement('img');
+        big.src = img.src;
+        big.style = 'max-width:94vw;max-height:86vh;border-radius:16px;box-shadow:0 7px 40px #ffd980bb;';
+        modal.appendChild(big);
+        modal.onclick = () => document.body.removeChild(modal);
+        document.body.appendChild(modal);
+      });
+    });
+
+    // Reveal-on-scroll animation
+    function revealOnScroll() {
+      document.querySelectorAll('section, .card, .profile-card').forEach(el=>{
+        const rect = el.getBoundingClientRect();
+        if(rect.top<window.innerHeight*0.96){
+          el.style.opacity=1; el.style.transform='none';
+        }
+      });
+    }
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('DOMContentLoaded', () => {
+      revealOnScroll();
+      // Animating cards & profiles when visible
+      document.querySelectorAll('.card,.profile-card,section').forEach(el=>{
+        el.style.opacity= 0;
+        el.style.transform= 'translateY(35px)';
+        setTimeout(()=>{el.style.transition='all .55s cubic-bezier(.33,2,.77,1)';},110);
+      });
+      setTimeout(revealOnScroll,350);
+    });
+  </script>
+</body>
+</html>

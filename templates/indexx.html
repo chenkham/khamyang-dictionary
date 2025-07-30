@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tai-Khamyang Dictionary & Culture</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(245, 87, 108, 0.6);
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        }
+
+        .btn i {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover i {
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 768px) {
+            .hero-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                font-size: 14px;
+                justify-content: center;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>TAI KHAMYANG</h2>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="/" class="nav-link active">Home</a>
+
+                <a href="/admin" class="nav-link">Admin</a>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">please register yourself to explore</h1>
+                <p class="hero-subtitle">Discover the rich heritage, language, and traditions of the Tai-Khamyang people. Join our community to explore our beautiful culture and preserve it for future generations.</p>
+                <div class="hero-buttons">
+                    <a href="/register" class="btn btn-register">
+                        <i class="fas fa-user-plus"></i> Register Now
+                    </a>
+                    <a href="/login" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="culture-circle">
+                    <i class="fas fa-seedling"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Preserve Our Heritage</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3>Trilingual Dictionary</h3>
+                    <p>Access words in Tai-Khamyang, English, and Assamese with audio pronunciations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3>Traditional Songs</h3>
+                    <p>Listen to and learn our beautiful cultural songs passed down through generations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Access your cultural resources anywhere, anytime on any device</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>Offline Access</h3>
+                    <p>Download and use the dictionary and songs even without internet connection</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>traditional dress</h3>
+                    <p>purchase our traditional outfits from shop section</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Preview Section -->
+    <section class="about-preview">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About Tai-Khamyang</h2>
+                    <p>We Tai-Khamyang people are an indigenous community with a rich cultural heritage spanning centuries. Our language, traditions, and songs are precious treasures that connect us to our ancestors and guide us toward the future.</p>
+                    <p>This digital platform will serves as a bridge between generations, helping preserve our language and culture for future Tai-Khamyang children and anyone interested in learning about our beautiful heritage.</p>
+                    <a href="https://sites.google.com/view/khamyanglearning/home" class="btn btn-outline">Learn More</a>
+                </div>
+                <div class="about-image">
+                    <div class="culture-pattern">
+                        <div class="pattern-circle"></div>
+                        <div class="pattern-circle"></div>
+                        <div class="pattern-circle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Tai-Khamyang Dictionary</h3>
+                    <p>Preserving culture through digital innovation</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <p>Let's Share this resource with our community and help preserve our beautiful culture😊😊.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Tai-Khamyang Dictionary. Made with ❤ for our community.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="social-media-links">
+        <a href="https://facebook.com" target="_blank" class="social-link facebook">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://instagram.com" target="_blank" class="social-link instagram">
+            <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://youtube.com/@khamyangboy?si=IEbeLOpr8dWyW_vk" target="_blank" class="social-link youtube">
+            <i class="fab fa-youtube"></i>
+        </a>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

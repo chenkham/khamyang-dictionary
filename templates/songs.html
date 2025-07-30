@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traditional Songs - Tai-Khamyang</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='song.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>TAI KHAMYANG</h2>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/dictionary" class="nav-link ">Dictionary</a>
+                <a href="/songs" class="nav-link active">Songs</a>
+                <a href="/shopnow" class="nav-link">shop</a>
+                <a href="/about" class="nav-link">About</a>
+                <a href="/admin" class="nav-link">Admin</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="page-header">
+        <h1><i class="fas fa-music"></i> Traditional Songs</h1>
+        <p>Experience the rich musical heritage of Tai culture</p>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-section">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search songs by title or description...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="stats" id="songStats">
+                <span id="totalSongs">0</span> songs available
+            </div>
+        </div>
+    </section>
+
+    <!-- Music Container -->
+    <div class="music-container">
+        <!-- Now Playing Section -->
+        <div class="now-playing" id="nowPlaying" style="display: none;">
+            <div class="album-art" id="albumArt">
+                <i class="fas fa-music"></i>
+            </div>
+            <div class="seek-container">
+                <input type="range" id="seekBar" min="0" max="100" value="0" step="0.1">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <div class="track-info">
+                <h3 id="currentTitle">Select a song to play</h3>
+                <p id="currentDescription">Beautiful melodies await...</p>
+            </div>
+
+            <div class="visualizer" id="visualizer" style="display: none;">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+            <div class="audio-controls">
+                <audio id="mainPlayer" controls preload="metadata" crossorigin="anonymous">
+                    Your browser does not support the audio element.
+                    <source id="audioSource" src="" type="">
+                </audio>
+            </div>
+
+            <div class="control-buttons">
+                <button class="control-btn" id="prevBtn" disabled>
+                    <i class="fas fa-step-backward"></i>
+                </button>
+                <button class="control-btn play-btn" id="mainPlayBtn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="control-btn" id="nextBtn" disabled>
+                    <i class="fas fa-step-forward"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Songs Grid -->
+        <div class="songs-grid" id="songsGrid">
+            <!-- Songs will be loaded here -->
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading your music...</p>
+        </div>
+
+        <!-- No Songs -->
+        <div class="no-results" id="noSongs" style="display: none;">
+            <i class="fas fa-music"></i>
+            <h3>No songs found</h3>
+            <p>Try adjusting your search or check back later for new songs</p>
+        </div>
+    </div>
+<script>
+    let isSeeking = false;
+    let seekInterval;
+    let touchStartX = 0;
+    let audioVisualizerInitialized = false;
+    let allSongs = [];
+    let filteredSongs = [];
+    let currentSongIndex = -1;
+    let isPlaying = false;
+    let audioContext;
+    let analyser;
+    let dataArray;
+    let animationId;
+    let audioSource = null;
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+
+    // Mobile Navigation
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('navMenu');
+
+    hamburger.addEventListener('click', function() {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    });
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    });
+
+    // Load songs on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadSongs();
+        setupPlayer();
+        setupSearch();
+    });
+
+    async function loadSongs() {
+        try {
+            showLoading();
+            console.log('Loading songs from API...');
+
+            const response = await fetch('/api/songs', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+
+            if (response.ok) {
+                allSongs = await response.json();
+                filteredSongs = [...allSongs];
+
+                console.log('Songs loaded:', allSongs.length);
+                console.log('Sample song data:', allSongs[0]);
+
+                displaySongs();
+                updateStats();
+
+                // Test first song's audio URL
+                if (allSongs.length > 0 && allSongs[0].file_url) {
+                    testAudioURL(allSongs[0].file_url, allSongs[0].title);
+                }
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Error loading songs:', error);
+            showError();
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // Test audio URL accessibility
+    async function testAudioURL(url, title) {
+        try {
+            console.log(`Testing audio URL for "${title}":`, url);
+
+            const response = await fetch(url, {
+                method: 'HEAD',
+                mode: 'cors'
+            });
+
+            console.log(`✓ Audio URL test passed for "${title}"`, {
+                status: response.status,
+                contentType: response.headers.get('content-type'),
+                contentLength: response.headers.get('content-length')
+            });
+
+        } catch (error) {
+            console.error(`✗ Audio URL test failed for "${title}":`, error);
+        }
+    }
+
+    function showLoading() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('songsGrid').style.display = 'none';
+        document.getElementById('noSongs').style.display = 'none';
+    }
+
+    function hideLoading() {
+        document.getElementById('loading').style.display = 'none';
+    }
+
+    function showError() {
+        document.getElementById('noSongs').style.display = 'block';
+        document.getElementById('songsGrid').style.display = 'none';
+    }
+
+    function setupSearch() {
+        const searchInput = document.getElementById('searchInput');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = this.value.toLowerCase().trim();
+                filterSongs(searchTerm);
+            }, 300);
+        });
+    }
+
+    function filterSongs(searchTerm) {
+        if (!searchTerm) {
+            filteredSongs = [...allSongs];
+        } else {
+            filteredSongs = allSongs.filter(song =>
+                song.title.toLowerCase().includes(searchTerm) ||
+                (song.description && song.description.toLowerCase().includes(searchTerm))
+            );
+        }
+        displaySongs();
+        updateStats();
+    }
+
+    function updateStats() {
+        document.getElementById('totalSongs').textContent = filteredSongs.length;
+    }
+
+    function displaySongs() {
+        const grid = document.getElementById('songsGrid');
+        const noSongs = document.getElementById('noSongs');
+
+        if (filteredSongs.length === 0) {
+            grid.style.display = 'none';
+            noSongs.style.display = 'block';
+            return;
+        }
+
+        grid.style.display = 'grid';
+        noSongs.style.display = 'none';
+
+        grid.innerHTML = filteredSongs.map((song, index) => {
+            const hasAudio = song.file_url && song.file_url.trim() !== '';
+            const audioStatus = hasAudio ? 'Play' : 'Audio Coming Soon';
+            const debugInfo = song.has_audio ? '🎵' : '❌';
+
+            return `
+                <div class="song-card" data-song-id="${song.id}" onclick="selectSong(${index})">
+                    <div class="song-header">
+                        <div class="song-icon">
+                            <i class="fas fa-music"></i>
+                            <span class="debug-indicator">${debugInfo}</span>
+                        </div>
+                        <div class="song-info">
+                            <h4>${song.title}</h4>
+                            <p>Traditional Song</p>
+                        </div>
+                    </div>
+                    <p class="song-description">${song.description || 'A beautiful traditional Tai-Khamyang song'}</p>
+                    <div class="song-actions">
+                        <button class="play-button" onclick="event.stopPropagation(); playSong(${index})" ${!hasAudio ? 'disabled' : ''}>
+                            <i class="fas fa-play"></i> ${audioStatus}
+                        </button>
+                        <span class="duration">${hasAudio ? '--:--' : 'N/A'}</span>
+                        ${hasAudio ? `<button class="test-btn" onclick="event.stopPropagation(); testSongAudio(${index})" title="Test Audio">🔍</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Test individual song audio
+    async function testSongAudio(index) {
+        const song = filteredSongs[index];
+        if (!song.id) return;
+
+        console.log(`Testing audio for song: ${song.title}`);
+
+        try {
+            const response = await fetch(`/api/songs/${song.id}/test-audio`);
+            const result = await response.json();
+
+            console.log('Audio test result:', result);
+
+            if (result.url_accessible) {
+                alert(`✓ Audio test passed for "${song.title}"\nContent-Type: ${result.content_type}\nSize: ${result.content_length} bytes`);
+            } else {
+                alert(`✗ Audio test failed for "${song.title}"\nURL not accessible or invalid`);
+            }
+        } catch (error) {
+            console.error('Audio test error:', error);
+            alert(`Audio test error: ${error.message}`);
+        }
+    }
+
+    function setupPlayer() {
+    const mainPlayer = document.getElementById('mainPlayer');
+    const mainPlayBtn = document.getElementById('mainPlayBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const seekBar = document.getElementById('seekBar');
+
+    // Enhanced audio element setup
+    mainPlayer.volume = 1.0;
+    mainPlayer.muted = false;
+    mainPlayer.preload = 'metadata';
+    mainPlayer.crossOrigin = 'anonymous';
+
+    // Seek bar functionality
+    seekBar.addEventListener('input', function() {
+        isSeeking = true;
+        updateTimeDisplay(this.value);
+    });
+
+    seekBar.addEventListener('change', function() {
+        if (mainPlayer.duration) {
+            const seekTime = (this.value / 100) * mainPlayer.duration;
+            mainPlayer.currentTime = seekTime;
+        }
+        isSeeking = false;
+    });
+
+    // Mouse events for desktop
+    seekBar.addEventListener('mousedown', function() {
+        isSeeking = true;
+        clearInterval(seekInterval);
+    });
+
+    seekBar.addEventListener('mouseup', function() {
+        isSeeking = false;
+        if (mainPlayer.duration) {
+            const seekTime = (this.value / 100) * mainPlayer.duration;
+            mainPlayer.currentTime = seekTime;
+        }
+        startSeekUpdate();
+    });
+
+    // Touch events for mobile
+    seekBar.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+        isSeeking = true;
+        clearInterval(seekInterval);
+        e.preventDefault();
+    });
+
+    seekBar.addEventListener('touchmove', function(e) {
+        const touchX = e.touches[0].clientX;
+        const deltaX = touchX - touchStartX;
+        const seekBarWidth = seekBar.offsetWidth;
+        const percentageChange = (deltaX / seekBarWidth) * 100;
+
+        if (mainPlayer.duration) {
+            const currentPercentage = parseFloat(seekBar.value);
+            let newPercentage = currentPercentage + percentageChange;
+            newPercentage = Math.max(0, Math.min(100, newPercentage));
+
+            seekBar.value = newPercentage;
+            updateTimeDisplay(newPercentage);
+        }
+
+        touchStartX = touchX;
+        e.preventDefault();
+    });
+
+    seekBar.addEventListener('touchend', function() {
+        isSeeking = false;
+        if (mainPlayer.duration) {
+            const seekTime = (seekBar.value / 100) * mainPlayer.duration;
+            mainPlayer.currentTime = seekTime;
+        }
+        startSeekUpdate();
+    });
+
+    // Player controls
+    mainPlayBtn.addEventListener('click', async function() {
+        if (currentSongIndex === -1) {
+            alert('Please select a song first');
+            return;
+        }
+
+        const currentSong = filteredSongs[currentSongIndex];
+        console.log('Play button clicked for:', currentSong.title);
+
+        try {
+            await initializeAudioContext();
+
+            if (mainPlayer.paused) {
+                console.log('Attempting to play audio...');
+                mainPlayer.volume = 1.0;
+                mainPlayer.muted = false;
+
+                const playPromise = mainPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            console.log('✓ Audio playback started successfully');
+                        })
+                        .catch(error => {
+                            console.error('✗ Play promise rejected:', error);
+                            handlePlaybackError(error, currentSong);
+                        });
+                }
+            } else {
+                mainPlayer.pause();
+            }
+        } catch (error) {
+            console.error('Play button error:', error);
+            handlePlaybackError(error, currentSong);
+        }
+    });
+
+    // Audio event listeners
+    mainPlayer.addEventListener('loadstart', () => {
+        console.log('Audio loading started');
+    });
+
+    mainPlayer.addEventListener('loadeddata', () => {
+        console.log('Audio data loaded');
+    });
+
+    mainPlayer.addEventListener('canplay', () => {
+        console.log('Audio can start playing');
+    });
+
+    mainPlayer.addEventListener('play', () => {
+        console.log('Audio play event fired');
+        isPlaying = true;
+        updatePlayButton();
+        showVisualizer();
+        startVisualization();
+        startSeekUpdate();
+    });
+
+    mainPlayer.addEventListener('pause', () => {
+        console.log('Audio pause event fired');
+        isPlaying = false;
+        updatePlayButton();
+        stopVisualization();
+        hideVisualizer();
+        clearInterval(seekInterval);
+    });
+
+    mainPlayer.addEventListener('ended', () => {
+        console.log('Audio ended');
+        clearInterval(seekInterval);
+        document.getElementById('seekBar').value = 0;
+        document.getElementById('currentTime').textContent = "0:00";
+
+        if (currentSongIndex < filteredSongs.length - 1) {
+            playSong(currentSongIndex + 1);
+        } else {
+            isPlaying = false;
+            updatePlayButton();
+            stopVisualization();
+            hideVisualizer();
+        }
+    });
+
+    mainPlayer.addEventListener('timeupdate', () => {
+        updateSeekBar();
+        updateDurationDisplay();
+    });
+
+    mainPlayer.addEventListener('loadedmetadata', () => {
+        console.log('Audio metadata loaded, duration:', mainPlayer.duration);
+        updateDurationDisplay();
+    });
+
+    mainPlayer.addEventListener('error', (e) => {
+        const error = mainPlayer.error;
+        console.error('Audio element error:', {
+            code: error?.code,
+            message: error?.message,
+            event: e
+        });
+        document.getElementById('seekBar').value = 0;
+        document.getElementById('currentTime').textContent = "0:00";
+
+        const errorMessages = {
+            1: 'MEDIA_ERR_ABORTED: Audio loading was aborted',
+            2: 'MEDIA_ERR_NETWORK: Network error occurred',
+            3: 'MEDIA_ERR_DECODE: Audio decoding failed',
+            4: 'MEDIA_ERR_SRC_NOT_SUPPORTED: Audio format not supported'
+        };
+
+        const errorMsg = errorMessages[error?.code] || 'Unknown audio error';
+        console.error('Detailed error:', errorMsg);
+
+        if (currentSongIndex >= 0) {
+            const currentSong = filteredSongs[currentSongIndex];
+            handlePlaybackError(new Error(errorMsg), currentSong);
+        }
+    });
+
+    mainPlayer.addEventListener('stalled', () => {
+        console.warn('Audio loading stalled');
+    });
+
+    mainPlayer.addEventListener('waiting', () => {
+        console.warn('Audio buffering...');
+    });
+
+    prevBtn.addEventListener('click', function() {
+        if (currentSongIndex > 0) {
+            playSong(currentSongIndex - 1);
+        }
+    });
+
+    nextBtn.addEventListener('click', function() {
+        if (currentSongIndex < filteredSongs.length - 1) {
+            playSong(currentSongIndex + 1);
+        }
+    });
+
+    // Start the seek update interval
+    startSeekUpdate();
+}
+// Add this new function
+function startSeekUpdate() {
+    clearInterval(seekInterval);
+    seekInterval = setInterval(updateSeekBar, 100);
+}
+
+// Update the seek bar position
+function updateSeekBar() {
+    const mainPlayer = document.getElementById('mainPlayer');
+    const seekBar = document.getElementById('seekBar');
+
+    if (!isSeeking && mainPlayer.duration && !isNaN(mainPlayer.duration)) {
+        const percentage = (mainPlayer.currentTime / mainPlayer.duration) * 100;
+        seekBar.value = percentage;
+        updateTimeDisplay(percentage);
+    }
+}
+
+function updateTimeDisplay(percentage) {
+    const mainPlayer = document.getElementById('mainPlayer');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationEl = document.getElementById('duration');
+
+    if (mainPlayer.duration && !isNaN(mainPlayer.duration)) {
+        const currentTime = (percentage / 100) * mainPlayer.duration;
+        currentTimeEl.textContent = formatTime(currentTime);
+        durationEl.textContent = formatTime(mainPlayer.duration);
+    }
+}
+
+
+    // Enhanced error handling
+    function handlePlaybackError(error, song) {
+        console.error('Playback error for song:', song.title, error);
+
+        retryCount++;
+
+        if (retryCount <= MAX_RETRIES) {
+            console.log(`Retrying playback (attempt ${retryCount}/${MAX_RETRIES})`);
+
+            // Try with the stream endpoint as fallback
+            setTimeout(() => {
+                const mainPlayer = document.getElementById('mainPlayer');
+                const streamUrl = `/api/songs/${song.id}/stream`;
+
+                console.log('Trying stream URL:', streamUrl);
+                mainPlayer.src = streamUrl;
+                mainPlayer.load();
+
+                setTimeout(() => {
+                    mainPlayer.play().catch(streamError => {
+                        console.error('Stream playback also failed:', streamError);
+                        if (retryCount >= MAX_RETRIES) {
+                            showPlaybackErrorMessage(song, error);
+                        }
+                    });
+                }, 1000);
+
+            }, 1000 * retryCount);
+        } else {
+            showPlaybackErrorMessage(song, error);
+            retryCount = 0; // Reset for next song
+        }
+    }
+
+    function showPlaybackErrorMessage(song, error) {
+        const errorMsg = `Unable to play "${song.title}"\n\nError: ${error.message}\n\nPossible causes:\n- Network connectivity issues\n- Audio file format not supported\n- File corruption\n\nPlease try:\n1. Checking your internet connection\n2. Trying a different browser\n3. Refreshing the page`;
+
+        alert(errorMsg);
+        console.error('Final playback failure:', {
+            song: song.title,
+            url: song.file_url,
+            error: error.message
+        });
+    }
+
+    async function initializeAudioContext() {
+        if (audioVisualizerInitialized) return;
+
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 64;
+
+            const mainPlayer = document.getElementById('mainPlayer');
+
+            if (!audioSource) {
+                audioSource = audioContext.createMediaElementSource(mainPlayer);
+                audioSource.connect(analyser);
+                analyser.connect(audioContext.destination);
+            }
+
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            audioVisualizerInitialized = true;
+
+            console.log('✓ Audio context initialized successfully');
+        } catch (e) {
+            console.error('Audio visualization setup failed:', e);
+        }
+    }
+
+    function selectSong(index) {
+        console.log('Selecting song:', filteredSongs[index].title);
+
+        currentSongIndex = index;
+        const song = filteredSongs[index];
+        retryCount = 0; // Reset retry count for new song
+
+        document.getElementById('seekBar').value = 0;
+        document.getElementById('currentTime').textContent = "0:00";
+        document.getElementById('currentTitle').textContent = song.title;
+        document.getElementById('currentDescription').textContent = song.description || 'A beautiful traditional song';
+        document.getElementById('nowPlaying').style.display = 'block';
+
+        const mainPlayer = document.getElementById('mainPlayer');
+        const audioSource = document.getElementById('audioSource');
+
+        if (song.file_url) {
+            mainPlayer.pause();
+            mainPlayer.currentTime = 0;
+
+            const audioType = getAudioType(song.file_url);
+            console.log('Loading song:', song.title, 'Type:', audioType, 'URL:', song.file_url);
+
+            try {
+                audioSource.src = song.file_url;
+                audioSource.type = audioType;
+                mainPlayer.src = song.file_url;
+
+                mainPlayer.load();
+                mainPlayer.style.display = 'block';
+                mainPlayer.volume = 1.0;
+                mainPlayer.muted = false;
+
+                console.log('Audio element configured successfully');
+
+            } catch (loadError) {
+                console.error('Error configuring audio:', loadError);
+                handlePlaybackError(loadError, song);
+            }
+        } else {
+            console.warn('No audio URL available for song:', song.title);
+            mainPlayer.style.display = 'none';
+        }
+
+        document.querySelectorAll('.song-card').forEach((card, i) => {
+            card.classList.toggle('active', i === index);
+        });
+
+        document.getElementById('prevBtn').disabled = index === 0;
+        document.getElementById('nextBtn').disabled = index === filteredSongs.length - 1;
+
+        document.getElementById('nowPlaying').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function playSong(index) {
+    console.log('Playing song at index:', index);
+
+    selectSong(index);
+    const song = filteredSongs[index];
+
+    if (!song.file_url) {
+        alert('Audio file not available for this song');
+        return;
+    }
+
+    const mainPlayer = document.getElementById('mainPlayer');
+
+    try {
+        await initializeAudioContext();
+
+        console.log('Attempting to play:', song.title);
+        mainPlayer.volume = 1.0;
+        mainPlayer.muted = false;
+
+        setTimeout(async () => {
+            try {
+                const playPromise = mainPlayer.play();
+                if (playPromise !== undefined) {
+                    await playPromise;
+                    console.log('✓ Successfully started playing:', song.title);
+                    // Start updating seek bar
+                    startSeekUpdate();
+                }
+            } catch (playError) {
+                console.error('Play failed:', playError);
+                handlePlaybackError(playError, song);
+            }
+        }, 500);
+
+    } catch (error) {
+        console.error('Playback setup failed:', error);
+        handlePlaybackError(error, song);
+    }
+   }
+
+    function getAudioType(url) {
+        const extension = url.split('.').pop().toLowerCase().split('?')[0]; // Remove query parameters
+        const audioTypes = {
+            'mp3': 'audio/mpeg',
+            'wav': 'audio/wav',
+            'ogg': 'audio/ogg',
+            'webm': 'audio/webm',
+            'm4a': 'audio/mp4',
+            'aac': 'audio/aac'
+        };
+        return audioTypes[extension] || 'audio/mpeg';
+    }
+
+    function canPlayAudioType(type) {
+        const audio = document.createElement('audio');
+        const support = audio.canPlayType(type);
+        console.log(`Browser support for ${type}:`, support);
+        return support !== '';
+    }
+
+    function updateDurationDisplay() {
+        const player = document.getElementById('mainPlayer');
+        if (currentSongIndex >= 0 && player.duration) {
+            const currentSongCard = document.querySelector(`.song-card[data-song-id="${filteredSongs[currentSongIndex]?.id}"]`);
+            if (currentSongCard) {
+                const durationSpan = currentSongCard.querySelector('.duration');
+                if (durationSpan) {
+                    durationSpan.textContent = formatTime(player.duration);
+                }
+            }
+        }
+    }
+
+    function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function updatePlayButton() {
+        const mainPlayBtn = document.getElementById('mainPlayBtn');
+        const icon = mainPlayBtn.querySelector('i');
+
+        if (isPlaying) {
+            icon.classList.replace('fa-play', 'fa-pause');
+        } else {
+            icon.classList.replace('fa-pause', 'fa-play');
+        }
+    }
+
+    function showVisualizer() {
+        document.getElementById('visualizer').style.display = 'flex';
+    }
+
+    function hideVisualizer() {
+        document.getElementById('visualizer').style.display = 'none';
+    }
+
+    function startVisualization() {
+        if (!analyser) return;
+
+        const bars = document.querySelectorAll('.visualizer .bar');
+        if (bars.length === 0) return;
+
+        function updateVisualizer() {
+            if (!isPlaying) return;
+
+            analyser.getByteFrequencyData(dataArray);
+
+            for (let i = 0; i < bars.length; i++) {
+                const value = dataArray[i * 2] / 255;
+                const height = Math.max(10, value * 100);
+                bars[i].style.height = `${height}%`;
+            }
+
+            animationId = requestAnimationFrame(updateVisualizer);
+        }
+
+        animationId = requestAnimationFrame(updateVisualizer);
+    }
+
+    function stopVisualization() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+
+        const bars = document.querySelectorAll('.visualizer .bar');
+        bars.forEach(bar => {
+            bar.style.height = '10%';
+        });
+    }
+
+    // Enhanced debug functions
+    function debugAudio() {
+        const mainPlayer = document.getElementById('mainPlayer');
+        const currentSong = currentSongIndex >= 0 ? filteredSongs[currentSongIndex] : null;
+
+        console.log('=== COMPREHENSIVE AUDIO DEBUG ===');
+        console.log('Current song:', currentSong?.title || 'None selected');
+        console.log('Current song index:', currentSongIndex);
+        console.log('Total songs loaded:', allSongs.length);
+        console.log('Filtered songs:', filteredSongs.length);
+
+        console.log('\n--- Audio Element Status ---');
+        console.log('Volume:', mainPlayer.volume);
+        console.log('Muted:', mainPlayer.muted);
+        console.log('Current src:', mainPlayer.src);
+        console.log('Ready state:', mainPlayer.readyState, getReadyStateText(mainPlayer.readyState));
+        console.log('Network state:', mainPlayer.networkState, getNetworkStateText(mainPlayer.networkState));
+        console.log('Paused:', mainPlayer.paused);
+        console.log('Current time:', mainPlayer.currentTime);
+        console.log('Duration:', mainPlayer.duration);
+        console.log('Buffered ranges:', getBufferedRanges(mainPlayer));
+
+        if (mainPlayer.error) {
+            console.log('Audio error:', {
+                code: mainPlayer.error.code,
+                message: mainPlayer.error.message
+            });
+        } else {
+            console.log('No audio errors detected');
+        }
+
+        console.log('\n--- Audio Context Status ---');
+        console.log('Audio context state:', audioContext?.state || 'Not initialized');
+        console.log('Audio context sample rate:', audioContext?.sampleRate || 'N/A');
+        console.log('Visualizer initialized:', audioVisualizerInitialized);
+
+        console.log('\n--- Browser Audio Support ---');
+        const audio = document.createElement('audio');
+        const formats = {
+            'MP3': 'audio/mpeg',
+            'WAV': 'audio/wav',
+            'OGG': 'audio/ogg',
+            'WebM': 'audio/webm',
+            'M4A': 'audio/mp4',
+            'AAC': 'audio/aac'
+        };
+
+        Object.entries(formats).forEach(([name, mime]) => {
+            const support = audio.canPlayType(mime);
+            console.log(`${name}:`, support || 'Not supported');
+        });
+
+        if (currentSong) {
+            console.log('\n--- Current Song Analysis ---');
+            console.log('Title:', currentSong.title);
+            console.log('File URL:', currentSong.file_url);
+            console.log('Signed URL:', currentSong.signed_url);
+            console.log('Content type:', currentSong.content_type);
+            console.log('Has audio flag:', currentSong.has_audio);
+
+            // Test the URL
+            if (currentSong.file_url) {
+                console.log('\n--- URL Accessibility Test ---');
+                testCurrentSongURL(currentSong);
+            }
+        }
+
+        console.log('\n--- Session Info ---');
+        console.log('Retry count:', retryCount);
+        console.log('Is playing:', isPlaying);
+        console.log('Page loaded at:', new Date().toISOString());
+    }
+
+    function getReadyStateText(state) {
+        const states = {
+            0: 'HAVE_NOTHING',
+            1: 'HAVE_METADATA',
+            2: 'HAVE_CURRENT_DATA',
+            3: 'HAVE_FUTURE_DATA',
+            4: 'HAVE_ENOUGH_DATA'
+        };
+        return states[state] || 'Unknown';
+    }
+
+    function getNetworkStateText(state) {
+        const states = {
+            0: 'NETWORK_EMPTY',
+            1: 'NETWORK_IDLE',
+            2: 'NETWORK_LOADING',
+            3: 'NETWORK_NO_SOURCE'
+        };
+        return states[state] || 'Unknown';
+    }
+
+    function getBufferedRanges(audio) {
+        const ranges = [];
+        for (let i = 0; i < audio.buffered.length; i++) {
+            ranges.push({
+                start: audio.buffered.start(i),
+                end: audio.buffered.end(i)
+            });
+        }
+        return ranges;
+    }
+
+    async function testCurrentSongURL(song) {
+        try {
+            console.log('Testing primary URL...');
+            const response = await fetch(song.file_url, {
+                method: 'HEAD',
+                mode: 'no-cors' // Try without CORS first
+            });
+            console.log('✓ Primary URL accessible (no-cors)');
+        } catch (error) {
+            console.log('✗ Primary URL failed (no-cors):', error.message);
+
+            try {
+                console.log('Testing with CORS...');
+                const corsResponse = await fetch(song.file_url, {
+                    method: 'HEAD',
+                    mode: 'cors'
+                });
+                console.log('✓ Primary URL accessible (cors)', {
+                    status: corsResponse.status,
+                    headers: Object.fromEntries(corsResponse.headers.entries())
+                });
+            } catch (corsError) {
+                console.log('✗ Primary URL failed (cors):', corsError.message);
+            }
+        }
+
+        if (song.signed_url && song.signed_url !== song.file_url) {
+            try {
+                console.log('Testing signed URL...');
+                const signedResponse = await fetch(song.signed_url, { method: 'HEAD' });
+                console.log('✓ Signed URL accessible', {
+                    status: signedResponse.status,
+                    headers: Object.fromEntries(signedResponse.headers.entries())
+                });
+            } catch (signedError) {
+                console.log('✗ Signed URL failed:', signedError.message);
+            }
+        }
+    }
+
+    // Simple fallback play function
+    function simplePlay() {
+        const mainPlayer = document.getElementById('mainPlayer');
+        if (currentSongIndex === -1) {
+            alert('Please select a song first');
+            return;
+        }
+
+        console.log('=== SIMPLE PLAY ATTEMPT ===');
+        const song = filteredSongs[currentSongIndex];
+        console.log('Song:', song.title);
+        console.log('URL:', song.file_url);
+
+        mainPlayer.volume = 1.0;
+        mainPlayer.muted = false;
+
+        console.log('Method 1: Direct play()');
+        mainPlayer.play()
+            .then(() => {
+                console.log('✓ Direct play successful');
+            })
+            .catch(error => {
+                console.log('✗ Direct play failed:', error);
+
+                console.log('Method 2: Load then play');
+                mainPlayer.load();
+                setTimeout(() => {
+                    mainPlayer.play()
+                        .then(() => console.log('✓ Load+play successful'))
+                        .catch(error2 => {
+                            console.log('✗ Load+play failed:', error2);
+
+                            console.log('Method 3: Try stream endpoint');
+                            mainPlayer.src = `/api/songs/${song.id}/stream`;
+                            mainPlayer.load();
+                            setTimeout(() => {
+                                mainPlayer.play()
+                                    .then(() => console.log('✓ Stream play successful'))
+                                    .catch(error3 => console.log('✗ Stream play failed:', error3));
+                            }, 1000);
+                        });
+                }, 1000);
+            });
+    }
+
+    // Test with a known working audio file
+    function testWithSampleAudio() {
+        const mainPlayer = document.getElementById('mainPlayer');
+        // Use a free, publicly available test audio file
+        const testUrls = [
+            'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3',
+            'https://www.soundjay.com/misc/sounds/beep-07a.mp3',
+            'https://file-examples.com/storage/fe68c265c66833b4ca9cb62/2017/11/file_example_MP3_700KB.mp3'
+        ];
+
+        console.log('=== TESTING WITH SAMPLE AUDIO ===');
+
+        testUrls.forEach((testUrl, index) => {
+            console.log(`Testing sample ${index + 1}:`, testUrl);
+
+            // Create a temporary audio element for testing
+            const testAudio = new Audio();
+            testAudio.crossOrigin = 'anonymous';
+            testAudio.volume = 0.1; // Low volume for testing
+
+            testAudio.onloadeddata = () => {
+                console.log(`✓ Sample ${index + 1} loaded successfully`);
+                testAudio.play()
+                    .then(() => {
+                        console.log(`✓ Sample ${index + 1} plays - browser audio works fine`);
+                        setTimeout(() => testAudio.pause(), 1000); // Stop after 1 second
+                    })
+                    .catch(error => {
+                        console.log(`✗ Sample ${index + 1} play failed:`, error);
+                    });
+            };
+
+            testAudio.onerror = (error) => {
+                console.log(`✗ Sample ${index + 1} failed to load:`, error);
+            };
+
+            testAudio.src = testUrl;
+        });
+    }
+
+    // Force reload current song with different strategies
+    function forceReloadSong() {
+        if (currentSongIndex === -1) {
+            alert('No song selected');
+            return;
+        }
+
+        const song = filteredSongs[currentSongIndex];
+        const mainPlayer = document.getElementById('mainPlayer');
+
+        console.log('=== FORCE RELOAD SONG ===');
+        console.log('Reloading:', song.title);
+
+        // Strategy 1: Clear and reload
+        mainPlayer.pause();
+        mainPlayer.src = '';
+        mainPlayer.load();
+
+        setTimeout(() => {
+            console.log('Setting new source...');
+            mainPlayer.src = song.file_url;
+            mainPlayer.load();
+
+            setTimeout(() => {
+                console.log('Attempting to play after reload...');
+                mainPlayer.play()
+                    .then(() => console.log('✓ Force reload successful'))
+                    .catch(error => {
+                        console.log('✗ Force reload failed:', error);
+
+                        // Strategy 2: Try signed URL if available
+                        if (song.signed_url) {
+                            console.log('Trying signed URL...');
+                            mainPlayer.src = song.signed_url;
+                            mainPlayer.load();
+
+                            setTimeout(() => {
+                                mainPlayer.play()
+                                    .then(() => console.log('✓ Signed URL successful'))
+                                    .catch(error2 => console.log('✗ Signed URL failed:', error2));
+                            }, 1000);
+                        }
+                    });
+            }, 1000);
+        }, 500);
+    }
+
+    // Make debug functions available globally for console access
+    window.debugAudio = debugAudio;
+    window.simplePlay = simplePlay;
+    window.testWithSampleAudio = testWithSampleAudio;
+    window.forceReloadSong = forceReloadSong;
+    window.testSongAudio = testSongAudio;
+
+    // Auto-debug on load (can be removed in production)
+    setTimeout(() => {
+        console.log('=== AUTO DEBUG INFO ===');
+        console.log('Available debug functions:');
+        console.log('- debugAudio() - Complete audio system analysis');
+        console.log('- simplePlay() - Try basic playback methods');
+        console.log('- testWithSampleAudio() - Test with known working files');
+        console.log('- forceReloadSong() - Reload current song with different strategies');
+        console.log('- testSongAudio(index) - Test specific song URL');
+    }, 2000);
+</script>
+</body>
+</html>
