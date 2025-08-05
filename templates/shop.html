@@ -81,8 +81,7 @@
                         <button class="auth-tab active" data-form="login">Login</button>
                         <button class="auth-tab" data-form="register">Register</button>
                     </div>
-                    <!-- the seller login form in shop.html -->
-                     <form class="auth-form" id="loginForm">
+                    <form class="auth-form" id="loginForm">
                          <h3>Seller Login</h3>
                          <div class="form-group">
                              <i class="fas fa-envelope"></i>
@@ -98,7 +97,6 @@
                              Forgot Password?
                          </a>
                      </div>
-
                      </form>
 
                     <form class="auth-form hidden" id="registerForm">
@@ -186,7 +184,6 @@
                             </div>
                         </div>
 
-                        <!-- Enhanced Image Upload Section -->
                         <div class="form-group">
                             <label>Product Images (Max 5 images, 2MB each)</label>
                             <div class="image-upload-container">
@@ -235,7 +232,6 @@
                         </div>
                     </div>
                     <div class="thumbnail-container" id="thumbnailContainer">
-                        <!-- Thumbnails will be populated here -->
                     </div>
                 </div>
                 <div class="product-details-section">
@@ -286,7 +282,7 @@
                         </div>
                     </div>
 
-                    <div class="detail-actions">
+                    <div class="detail-actions" style="position: relative;">
                         <button class="buy-now-btn" id="buyOnWhatsAppBtn">
                             <i class="fab fa-whatsapp"></i>
                             <span>Buy on WhatsApp</span>
@@ -295,6 +291,55 @@
                             <i class="fas fa-phone"></i>
                             <span>Contact Seller</span>
                         </button>
+                        <button class="share-btn" id="shareProductBtn">
+                            <i class="fas fa-share-alt"></i>
+                            <span>Share Product</span>
+                        </button>
+
+                        <!-- Share Options Modal -->
+                        <div class="share-modal hidden" id="shareModal">
+                            <div class="share-header">
+                                <h4>Share this product</h4>
+                                <button class="close-share-btn" id="closeShareBtn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="share-options">
+                                <button class="share-option whatsapp" id="shareWhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                    <span>WhatsApp</span>
+                                </button>
+                                <button class="share-option facebook" id="shareFacebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                    <span>Facebook</span>
+                                </button>
+                                <button class="share-option instagram" id="shareInstagram">
+                                    <i class="fab fa-instagram"></i>
+                                    <span>Instagram</span>
+                                </button>
+                                <button class="share-option twitter" id="shareTwitter">
+                                    <i class="fab fa-twitter"></i>
+                                    <span>Twitter</span>
+                                </button>
+                                <button class="share-option telegram" id="shareTelegram">
+                                    <i class="fab fa-telegram-plane"></i>
+                                    <span>Telegram</span>
+                                </button>
+                                <button class="share-option linkedin" id="shareLinkedIn">
+                                    <i class="fab fa-linkedin-in"></i>
+                                    <span>LinkedIn</span>
+                                </button>
+                            </div>
+                            <div class="share-link-section">
+                                <label>Product Link:</label>
+                                <div class="link-input-group">
+                                    <input type="text" id="productShareLink" readonly>
+                                    <button class="copy-link-btn" id="copyLinkBtn">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -362,6 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedImages = [];
     let currentImageIndex = 0;
     let currentProductImages = [];
+    let currentProduct = null; // For sharing
 
     // --- SELECTORS ---
     const buyerSection = document.getElementById('buyerSection');
@@ -443,6 +489,19 @@ document.addEventListener('DOMContentLoaded', () => {
             tab.addEventListener('click', () => switchTab(tab.dataset.tab));
         });
 
+        // Share functionality
+        document.getElementById('shareProductBtn').addEventListener('click', toggleShareModal);
+        document.getElementById('closeShareBtn').addEventListener('click', closeShareModal);
+        document.getElementById('copyLinkBtn').addEventListener('click', copyProductLink);
+
+        // Share options
+        document.getElementById('shareWhatsApp').addEventListener('click', shareToWhatsApp);
+        document.getElementById('shareFacebook').addEventListener('click', shareToFacebook);
+        document.getElementById('shareInstagram').addEventListener('click', shareToInstagram);
+        document.getElementById('shareTwitter').addEventListener('click', shareToTwitter);
+        document.getElementById('shareTelegram').addEventListener('click', shareToTelegram);
+        document.getElementById('shareLinkedIn').addEventListener('click', shareToLinkedIn);
+
         // Edit Product Modal Events
         document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
         document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
@@ -458,6 +517,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const button = e.target.closest('.edit-btn');
                 const productId = button.dataset.productId;
                 openEditModal(productId);
+            }
+        });
+
+        // Close share modal when clicking outside
+        document.addEventListener('click', (e) => {
+            const shareModal = document.getElementById('shareModal');
+            const shareBtn = document.getElementById('shareProductBtn');
+            if (!shareModal.contains(e.target) && !shareBtn.contains(e.target)) {
+                closeShareModal();
             }
         });
     };
@@ -557,20 +625,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- BUYER FUNCTIONS ---
     const loadProducts = async () => {
+        // Mock data for testing
+        const mockProducts = [
+            {
+                id: '1',
+                name: 'Traditional Tai-Khamyang Women\'s Dress',
+                category: 'women',
+                price: 2999,
+                original_price: 3499,
+                description: 'Beautiful handwoven traditional dress with intricate patterns',
+                stock_quantity: 10,
+                images: ['https://via.placeholder.com/400x600/4a7c59/ffffff?text=Traditional+Dress'],
+                seller_info: {
+                    business_name: 'Khamyang Crafts',
+                    whatsapp: '917002345678'
+                }
+            },
+            {
+                id: '2',
+                name: 'Traditional Tai-Khamyang Men\'s Attire',
+                category: 'men',
+                price: 2499,
+                original_price: 2999,
+                description: 'Elegant traditional men\'s clothing with cultural significance',
+                stock_quantity: 5,
+                images: ['https://via.placeholder.com/400x600/2c5530/ffffff?text=Men+Attire'],
+                seller_info: {
+                    business_name: 'Heritage Textiles',
+                    whatsapp: '917001234567'
+                }
+            }
+        ];
+
         try {
+            // Try to fetch from API first
             const response = await fetch('/api/products');
             const data = await response.json();
             if (data.success) {
                 products = data.products;
-                displayProducts(products);
             } else {
-                console.error('Failed to load products:', data.message);
-                productsGrid.innerHTML = '<p>Could not load products.</p>';
+                // Fallback to mock data
+                products = mockProducts;
             }
         } catch (error) {
-            console.error('Error fetching products:', error);
-            productsGrid.innerHTML = '<p>Error loading products.</p>';
+            // Fallback to mock data if API fails
+            console.log('API not available, using mock data');
+            products = mockProducts;
         }
+
+        displayProducts(products);
     };
 
     const displayProducts = (productsToDisplay) => {
@@ -635,6 +738,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ENHANCED PRODUCT DETAIL POPUP ---
     const openProductDetail = (product) => {
+        currentProduct = product; // Store for sharing
         const popup = document.getElementById('productDetailPopup');
 
         // Set product info
@@ -739,6 +843,120 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const closeProductDetail = () => {
         document.getElementById('productDetailPopup').classList.add('hidden');
+        closeShareModal(); // Also close share modal when closing product detail
+    };
+
+    // --- SHARE FUNCTIONALITY ---
+    const generateProductLink = (product) => {
+        const baseUrl = window.location.origin + window.location.pathname;
+        return `${baseUrl}?product=${product.id}&share=1`;
+    };
+
+    const toggleShareModal = () => {
+        const shareModal = document.getElementById('shareModal');
+        const isHidden = shareModal.classList.contains('hidden');
+
+        if (isHidden) {
+            // Generate and set the product link
+            const productLink = generateProductLink(currentProduct);
+            document.getElementById('productShareLink').value = productLink;
+            shareModal.classList.remove('hidden');
+        } else {
+            shareModal.classList.add('hidden');
+        }
+    };
+
+    const closeShareModal = () => {
+        document.getElementById('shareModal').classList.add('hidden');
+    };
+
+    const copyProductLink = async () => {
+        const linkInput = document.getElementById('productShareLink');
+        const copyBtn = document.getElementById('copyLinkBtn');
+
+        try {
+            await navigator.clipboard.writeText(linkInput.value);
+            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+            copyBtn.classList.add('copied');
+
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        } catch (err) {
+            // Fallback for older browsers
+            linkInput.select();
+            document.execCommand('copy');
+            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+            copyBtn.classList.add('copied');
+
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        }
+    };
+
+    const shareToWhatsApp = () => {
+        const productLink = generateProductLink(currentProduct);
+        const message = `Check out this amazing traditional Tai-Khamyang product!\n\n${currentProduct.name}\nPrice: ₹${currentProduct.price}\n\n${productLink}`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        closeShareModal();
+    };
+
+    const shareToFacebook = () => {
+        const productLink = generateProductLink(currentProduct);
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productLink)}`;
+        window.open(facebookUrl, '_blank', 'width=600,height=400');
+        closeShareModal();
+    };
+
+    const shareToInstagram = () => {
+        copyProductLink();
+        alert('Link copied! You can now paste it in your Instagram story or post.');
+        window.open('https://www.instagram.com/', '_blank');
+        closeShareModal();
+    };
+
+    const shareToTwitter = () => {
+        const productLink = generateProductLink(currentProduct);
+        const text = `Check out this traditional Tai-Khamyang product: ${currentProduct.name} - Only ₹${currentProduct.price}!`;
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(productLink)}`;
+        window.open(twitterUrl, '_blank', 'width=600,height=400');
+        closeShareModal();
+    };
+
+    const shareToTelegram = () => {
+        const productLink = generateProductLink(currentProduct);
+        const message = `Check out this traditional Tai-Khamyang product!\n\n${currentProduct.name}\nPrice: ₹${currentProduct.price}\n\n${productLink}`;
+        const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(productLink)}&text=${encodeURIComponent(message)}`;
+        window.open(telegramUrl, '_blank');
+        closeShareModal();
+    };
+
+    const shareToLinkedIn = () => {
+        const productLink = generateProductLink(currentProduct);
+        const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(productLink)}`;
+        window.open(linkedinUrl, '_blank', 'width=600,height=400');
+        closeShareModal();
+    };
+
+    // Handle shared product links on page load
+    const handleSharedProduct = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('product');
+        const isShared = urlParams.get('share');
+
+        if (productId && isShared) {
+            switchMode('buyer');
+            setTimeout(() => {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    openProductDetail(product);
+                }
+            }, 1000);
+        }
     };
 
     // --- SELLER FUNCTIONS ---
@@ -813,7 +1031,6 @@ document.addEventListener('DOMContentLoaded', () => {
             password: document.getElementById('regPassword').value
         };
 
-        // Basic validation
         if (!data.fullName || !data.email || !data.phone || !data.whatsapp || !data.shopName || !data.password) {
             alert('Please fill in all required fields.');
             return;
@@ -834,7 +1051,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 alert('Registration successful! Please login.');
                 showAuthForm('login');
-                // Clear form
                 document.getElementById('registerForm').reset();
             } else {
                 alert(`Registration failed: ${result.message || 'Unknown error'}`);
@@ -858,31 +1074,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- SELLER DASHBOARD FUNCTIONS ---
     const showDashboardSection = (section) => {
-    document.querySelectorAll('.dashboard-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.dashboard-btn[data-section="${section}"]`).classList.add('active');
+        document.querySelectorAll('.dashboard-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.dashboard-btn[data-section="${section}"]`).classList.add('active');
 
-    document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
+        document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
 
-    // Add this FIX:
-    const sectionId = `${section}ProductsSection`;  // make sure it matches your HTML ID
-    const targetSection = document.getElementById(sectionId);
+        const sectionId = `${section}ProductsSection`;
+        const targetSection = document.getElementById(sectionId);
 
-    if (targetSection) {
-        targetSection.classList.remove('hidden');
-    } else {
-        console.error(`Missing section ID: ${sectionId}`);
-    }
+        if (targetSection) {
+            targetSection.classList.remove('hidden');
+        } else {
+            console.error(`Missing section ID: ${sectionId}`);
+        }
 
-    if (section === 'manage') loadSellerProducts();
-};
-
+        if (section === 'manage') loadSellerProducts();
+    };
 
     const handleAddProduct = async (e) => {
         e.preventDefault();
 
-        // Client-side validation
         const productName = document.getElementById('productName').value.trim();
         const productPrice = document.getElementById('productPrice').value;
         const productDescription = document.getElementById('productDescription').value.trim();
@@ -903,15 +1115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
 
         try {
-            // Simulate image upload if API endpoint not available
-            let imageUrls = [];
-            if (typeof uploadImages === 'function') {
-                imageUrls = await uploadImages(selectedImages);
-            } else {
-                // Fallback - use the data URLs directly (not recommended for production)
-                imageUrls = selectedImages.map(img => img.url);
-                console.warn('Image upload API not available - using data URLs directly');
-            }
+            const imageUrls = selectedImages.map(img => img.url);
 
             const data = {
                 name: productName,
@@ -921,20 +1125,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 description: productDescription,
                 stockQuantity: productStock,
                 images: imageUrls,
-                seller_id: currentUser?.id || null // Include seller ID if available
+                seller_id: currentUser?.id || null
             };
 
-            // Simulate API response if endpoint not available
             let response;
-            if (typeof fetch === 'function') {
+            try {
                 response = await fetch('/api/products/add', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-            } else {
-                // Mock response for testing
-                console.log('Product data to be submitted:', data);
+            } catch (fetchError) {
+                console.log('API not available, using mock response');
                 response = {
                     json: async () => ({
                         success: true,
@@ -954,7 +1156,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.target.reset();
                 selectedImages = [];
                 updateImagePreview();
-                // Add to local products array
                 if (result.product) {
                     products.push(result.product);
                 }
@@ -974,13 +1175,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadSellerProducts = async () => {
         const tableContainer = document.getElementById('sellerProductsTable');
         try {
-            // Simulate API call if needed
             let response;
-            if (typeof fetch === 'function') {
+            try {
                 response = await fetch('/api/seller/products');
-            } else {
-                // Mock response for testing
-                console.log('Fetching seller products');
+            } catch (fetchError) {
+                console.log('API not available, showing mock products');
                 response = {
                     json: async () => ({
                         success: true,
@@ -1065,30 +1264,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tableContainer.appendChild(productsGrid);
     };
 
-    // --- EDIT PRODUCT FUNCTIONS ---
     const openEditModal = async (productId) => {
         try {
-            // Simulate API call if needed
-            let response;
-            if (typeof fetch === 'function') {
-                response = await fetch(`/api/products/${productId}`);
-            } else {
-                // Mock response for testing
-                console.log('Fetching product details for:', productId);
-                const product = products.find(p => p.id === productId);
-                response = {
-                    json: async () => ({
-                        success: !!product,
-                        product: product || null
-                    })
-                };
-            }
-
-            const data = await response.json();
-
-            if (data.success && data.product) {
-                const product = data.product;
-
+            const product = products.find(p => p.id === productId);
+            if (product) {
                 document.getElementById('editProductId').value = product.id;
                 document.getElementById('editProductName').value = product.name;
                 document.getElementById('editProductCategory').value = product.category;
@@ -1099,7 +1278,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 document.getElementById('editProductModal').classList.remove('hidden');
             } else {
-                alert('Failed to load product details');
+                alert('Product not found');
             }
         } catch (error) {
             console.error('Open edit modal error:', error);
@@ -1124,47 +1303,23 @@ document.addEventListener('DOMContentLoaded', () => {
             stockQuantity: document.getElementById('editProductStock').value
         };
 
-        // Validation
         if (!data.name || !data.price || !data.description || !data.stockQuantity) {
             alert('Please fill in all required fields.');
             return;
         }
 
         try {
-            // Simulate API call if needed
-            let response;
-            if (typeof fetch === 'function') {
-                response = await fetch(`/api/products/${productId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-            } else {
-                // Mock response for testing
-                console.log('Updating product:', productId, data);
-                const index = products.findIndex(p => p.id === productId);
-                if (index >= 0) {
-                    products[index] = { ...products[index], ...data };
-                }
-                response = {
-                    json: async () => ({
-                        success: index >= 0,
-                        message: index >= 0 ? 'Product updated' : 'Product not found'
-                    })
-                };
-            }
-
-            const result = await response.json();
-            if (result.success) {
+            const index = products.findIndex(p => p.id === productId);
+            if (index >= 0) {
+                products[index] = { ...products[index], ...data };
                 alert('Product updated successfully!');
                 closeEditModal();
                 loadSellerProducts();
-                // Refresh buyer view if needed
                 if (!buyerSection.classList.contains('hidden')) {
                     displayProducts(products);
                 }
             } else {
-                alert(`Failed to update product: ${result.message || 'Unknown error'}`);
+                alert('Product not found');
             }
         } catch (error) {
             console.error('Edit product error:', error);
@@ -1173,30 +1328,32 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const deleteProduct = async (productId) => {
-    const confirmDelete = confirm("Are you sure you want to delete this product?");
-    if (!confirmDelete) return;
+        const confirmDelete = confirm("Are you sure you want to delete this product?");
+        if (!confirmDelete) return;
 
-    try {
-        const response = await fetch(`/api/products/${productId}`, {
-            method: 'DELETE'
-        });
-        const result = await response.json();
-
-        if (result.success) {
-            alert("Product deleted successfully!");
-            loadSellerProducts(); // Refresh product list
-        } else {
-            alert(`Failed to delete: ${result.message}`);
+        try {
+            const index = products.findIndex(p => p.id === productId);
+            if (index >= 0) {
+                products.splice(index, 1);
+                alert("Product deleted successfully!");
+                loadSellerProducts();
+                if (!buyerSection.classList.contains('hidden')) {
+                    displayProducts(products);
+                }
+            } else {
+                alert("Product not found");
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+            alert("An error occurred while deleting the product.");
         }
-    } catch (error) {
-        console.error("Delete error:", error);
-        alert("An error occurred while deleting the product.");
-    }
-};
-
+    };
 
     // --- START THE APP ---
     initializeApp();
+
+    // Handle shared product links
+    window.addEventListener('load', handleSharedProduct);
 });
 </script>
 

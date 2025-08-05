@@ -339,17 +339,18 @@
 
     // Seek bar functionality
     seekBar.addEventListener('input', function() {
-        isSeeking = true;
-        updateTimeDisplay(this.value);
-    });
+    isSeeking = true;
+    const seekTime = (this.value / 100) * mainPlayer.duration;
+    document.getElementById('currentTime').textContent = formatTime(seekTime);
+});
 
-    seekBar.addEventListener('change', function() {
-        if (mainPlayer.duration) {
-            const seekTime = (this.value / 100) * mainPlayer.duration;
-            mainPlayer.currentTime = seekTime;
-        }
-        isSeeking = false;
-    });
+seekBar.addEventListener('change', function() {
+    if (mainPlayer.duration) {
+        const seekTime = (this.value / 100) * mainPlayer.duration;
+        mainPlayer.currentTime = seekTime;
+    }
+    isSeeking = false;
+});
 
     // Mouse events for desktop
     seekBar.addEventListener('mousedown', function() {
